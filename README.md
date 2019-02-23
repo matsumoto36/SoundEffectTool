@@ -3,4 +3,4 @@
 ## Used
 - Dxlib
 - XAudio2
-- AvalonDock
+- Extended WPF Toolkit
