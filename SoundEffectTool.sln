@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.421
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SoundEffectToolView", "SoundEffectToolView\SoundEffectToolView.csproj", "{A3E0B2DB-022F-45B4-B11C-A0EEB7F2F099}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SoundEffectToolModel", "SoundEffectToolModel\SoundEffectToolModel.vcxproj", "{70BD2C20-0C61-4F2C-BE32-2FC397DE0646}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AudioLibrary", "AudioLibrary\AudioLibrary.vcxproj", "{167D4C53-92AF-47E7-A169-49F8F1A73749}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SoundEffectToolVM", "SoundEffectToolVM\SoundEffectToolVM.vcxproj", "{4ABB5C0F-F6AD-4C40-985B-2E6F0338911F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SoundEffectToolGUI", "SoundEffectToolGUI\SoundEffectToolGUI.csproj", "{A3E0B2DB-022F-45B4-B11C-A0EEB7F2F099}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SoundEffectTool", "SoundEffectTool\SoundEffectTool.vcxproj", "{70BD2C20-0C61-4F2C-BE32-2FC397DE0646}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ClassLibrary", "ClassLibrary\ClassLibrary.vcxproj", "{4ABB5C0F-F6AD-4C40-985B-2E6F0338911F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,12 +19,18 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{167D4C53-92AF-47E7-A169-49F8F1A73749}.Debug|x64.ActiveCfg = Debug|x64
+		{167D4C53-92AF-47E7-A169-49F8F1A73749}.Debug|x64.Build.0 = Debug|x64
+		{167D4C53-92AF-47E7-A169-49F8F1A73749}.Debug|x86.ActiveCfg = Debug|Win32
+		{167D4C53-92AF-47E7-A169-49F8F1A73749}.Debug|x86.Build.0 = Debug|Win32
+		{167D4C53-92AF-47E7-A169-49F8F1A73749}.Release|x64.ActiveCfg = Release|x64
+		{167D4C53-92AF-47E7-A169-49F8F1A73749}.Release|x64.Build.0 = Release|x64
+		{167D4C53-92AF-47E7-A169-49F8F1A73749}.Release|x86.ActiveCfg = Release|Win32
+		{167D4C53-92AF-47E7-A169-49F8F1A73749}.Release|x86.Build.0 = Release|Win32
 		{A3E0B2DB-022F-45B4-B11C-A0EEB7F2F099}.Debug|x64.ActiveCfg = Debug|x86
-		{A3E0B2DB-022F-45B4-B11C-A0EEB7F2F099}.Debug|x64.Build.0 = Debug|x86
 		{A3E0B2DB-022F-45B4-B11C-A0EEB7F2F099}.Debug|x86.ActiveCfg = Debug|x86
 		{A3E0B2DB-022F-45B4-B11C-A0EEB7F2F099}.Debug|x86.Build.0 = Debug|x86
 		{A3E0B2DB-022F-45B4-B11C-A0EEB7F2F099}.Release|x64.ActiveCfg = Release|x86
-		{A3E0B2DB-022F-45B4-B11C-A0EEB7F2F099}.Release|x64.Build.0 = Release|x86
 		{A3E0B2DB-022F-45B4-B11C-A0EEB7F2F099}.Release|x86.ActiveCfg = Release|x86
 		{A3E0B2DB-022F-45B4-B11C-A0EEB7F2F099}.Release|x86.Build.0 = Release|x86
 		{70BD2C20-0C61-4F2C-BE32-2FC397DE0646}.Debug|x64.ActiveCfg = Debug|x64
@@ -35,14 +41,6 @@ Global
 		{70BD2C20-0C61-4F2C-BE32-2FC397DE0646}.Release|x64.Build.0 = Release|x64
 		{70BD2C20-0C61-4F2C-BE32-2FC397DE0646}.Release|x86.ActiveCfg = Release|Win32
 		{70BD2C20-0C61-4F2C-BE32-2FC397DE0646}.Release|x86.Build.0 = Release|Win32
-		{167D4C53-92AF-47E7-A169-49F8F1A73749}.Debug|x64.ActiveCfg = Debug|x64
-		{167D4C53-92AF-47E7-A169-49F8F1A73749}.Debug|x64.Build.0 = Debug|x64
-		{167D4C53-92AF-47E7-A169-49F8F1A73749}.Debug|x86.ActiveCfg = Debug|Win32
-		{167D4C53-92AF-47E7-A169-49F8F1A73749}.Debug|x86.Build.0 = Debug|Win32
-		{167D4C53-92AF-47E7-A169-49F8F1A73749}.Release|x64.ActiveCfg = Release|x64
-		{167D4C53-92AF-47E7-A169-49F8F1A73749}.Release|x64.Build.0 = Release|x64
-		{167D4C53-92AF-47E7-A169-49F8F1A73749}.Release|x86.ActiveCfg = Release|Win32
-		{167D4C53-92AF-47E7-A169-49F8F1A73749}.Release|x86.Build.0 = Release|Win32
 		{4ABB5C0F-F6AD-4C40-985B-2E6F0338911F}.Debug|x64.ActiveCfg = Debug|x64
 		{4ABB5C0F-F6AD-4C40-985B-2E6F0338911F}.Debug|x64.Build.0 = Debug|x64
 		{4ABB5C0F-F6AD-4C40-985B-2E6F0338911F}.Debug|x86.ActiveCfg = Debug|Win32
