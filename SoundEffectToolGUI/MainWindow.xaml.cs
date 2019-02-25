@@ -20,6 +20,11 @@ namespace SoundEffectToolView {
 	public partial class MainWindow : Window {
 		public MainWindow() {
 			InitializeComponent();
+
+		}
+
+		private void MenuItem_Click(object sender, RoutedEventArgs e) {
+			MessageBox.Show("使用したライブラリ/フレームワーク\r\n・Dxlib\r\n・XAudio2\r\n・Extended WPF Toolkit", "情報", MessageBoxButton.OK);
 		}
 	}
 }
