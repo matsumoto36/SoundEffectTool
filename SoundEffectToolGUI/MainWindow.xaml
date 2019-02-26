@@ -4,6 +4,8 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        xmlns:xcad="http://schemas.xceed.com/wpf/xaml/avalondock"
+        xmlns:s="clr-namespace:System;assembly=mscorlib"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
@@ -17,5 +19,37 @@
                 <MenuItem Header="情報" Click="MenuItem_Click" />
             </MenuItem>
         </Menu>
+        <xcad:DockingManager Grid.Row="1"
+                           AllowMixedOrientation="True"
+                           BorderBrush="Black"
+                           BorderThickness="1"
+                           Theme="{Binding ElementName=_themeCombo, Path=SelectedItem.Tag}">
+            <xcad:DockingManager.DocumentHeaderTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="{Binding IconSource}" Margin="0,0,4,0"/>
+                        <TextBlock Text="{Binding Title}" />
+                    </StackPanel>
+                </DataTemplate>
+            </xcad:DockingManager.DocumentHeaderTemplate>
+            <xcad:LayoutRoot x:Name="_layoutRoot">
+                <xcad:LayoutPanel Orientation="Horizontal">
+                    <xcad:LayoutAnchorablePane DockWidth="200">
+                        <xcad:LayoutAnchorable ContentId="left" Title="Left" AutoHideWidth="240">
+                        </xcad:LayoutAnchorable>
+                    </xcad:LayoutAnchorablePane>
+ 
+                    <xcad:LayoutAnchorablePane DockWidth="125">
+                        <xcad:LayoutAnchorable ContentId="center" Title="Center" >
+                        </xcad:LayoutAnchorable>
+                    </xcad:LayoutAnchorablePane>
+
+                    <xcad:LayoutAnchorablePane DockWidth="125">
+                        <xcad:LayoutAnchorable ContentId="right" Title="Right" >
+                        </xcad:LayoutAnchorable>
+                    </xcad:LayoutAnchorablePane>
+                </xcad:LayoutPanel>
+            </xcad:LayoutRoot>
+        </xcad:DockingManager>
     </Grid>
 </Window>
