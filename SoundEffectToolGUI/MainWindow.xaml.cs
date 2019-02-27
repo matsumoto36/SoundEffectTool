@@ -13,13 +13,21 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace SoundEffectToolView {
+
+namespace SoundEffectToolGUI {
 	/// <summary>
 	/// MainWindow.xaml の相互作用ロジック
 	/// </summary>
 	public partial class MainWindow : Window {
 		public MainWindow() {
 			InitializeComponent();
+
+			//Dxlib黒画面表示
+			CompositionTarget.Rendering += CompositionTarget_Rendering;
+		}
+
+		private void CompositionTarget_Rendering(object sender, EventArgs e) {
+
 
 		}
 

@@ -2,9 +2,18 @@
 
 using namespace System;
 
-namespace SoundEffectToolVM {
-	public ref class Class1
-	{
-		// TODO: このクラスのメソッドをここに追加します。
+namespace SoundEffectTool {
+
+	class SoundEffectToolSystem;
+	public ref class SoundEffectToolHelper {
+
+		SoundEffectToolSystem* instance;
+
+	public :
+		
+		void Generate();
+
+		SoundEffectToolSystem* GetInstance();
+
 	};
 }
