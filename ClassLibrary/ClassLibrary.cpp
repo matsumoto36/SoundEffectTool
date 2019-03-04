@@ -1,15 +1,23 @@
 #include "stdafx.h"
 
-#include "ClassLibrary.h"
+#include <Windows.h>
 #include "SoundEffectTool.h"
+#include "ClassLibrary.h"
+
+using namespace SoundEffectTool;
 
 namespace SoundEffectTool {
 
-	void SoundEffectToolHelper::Generate() {
-		instance = new SoundEffectToolSystem;
+	bool SoundEffectToolHelper::Initialize() {
+		return SoundEffectToolManager::Initialize();
+	}
+	void SoundEffectToolHelper::Final() {
+		SoundEffectToolManager::Final();
 	}
 
-	SoundEffectToolSystem* SoundEffectToolHelper::GetInstance() {
-		return instance;
+	const IntPtr SoundEffectToolHelper::CreateDxView(IntPtr windowHandle) {
+		auto hwnd = reinterpret_cast<HWND>(windowHandle.ToPointer());
+		auto ptr = SoundEffectToolManager::CreateDxView(hwnd);
+		return IntPtr(&ptr);
 	}
 }

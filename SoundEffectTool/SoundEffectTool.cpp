@@ -5,18 +5,30 @@
 
 #include "SoundEffectTool.h"
 #include "AudioLibrary.h"
-#include "DxLib.h"
-
-using namespace AudioLibrary;
-using namespace DxLib;
 
 namespace SoundEffectTool {
 
-	void SoundEffectToolSystem::GenerateAudio() {
-		audio = new Audio;
+	SoundEffectToolManager* SoundEffectToolManager::_instance;
+
+	SoundEffectToolManager::SoundEffectToolManager()
+	{}
+
+	SoundEffectToolManager::~SoundEffectToolManager() {}
+
+	bool SoundEffectToolManager::Initialize() {
+		_instance = new SoundEffectToolManager();
+		return true;
+	}
+	void SoundEffectToolManager::Final() {
+		if(_instance) delete _instance;
 	}
 
-	Audio* SoundEffectToolSystem::GetAudio() {
-		return audio;
+	// ウィンドウの生成
+	// 戻り値はバックバッファ
+	const void* SoundEffectToolManager::CreateDxView(HWND windowHandle) {
+		auto renderer = make_unique<Renderer>();
+		renderer->Initialize(windowHandle);
+		_instance->_rendererList.emplace_back(move(renderer));
+		return renderer.get()->GetBackBuffer();
 	}
 }

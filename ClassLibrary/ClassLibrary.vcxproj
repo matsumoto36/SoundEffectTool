@@ -172,7 +172,7 @@
   <ItemGroup>
     <ProjectReference Include="..\SoundEffectTool\SoundEffectTool.vcxproj">
       <Project>{70bd2c20-0c61-4f2c-be32-2fc397de0646}</Project>
-      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
       <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
     </ProjectReference>
   </ItemGroup>

@@ -4,16 +4,15 @@ using namespace System;
 
 namespace SoundEffectTool {
 
-	class SoundEffectToolSystem;
 	public ref class SoundEffectToolHelper {
-
-		SoundEffectToolSystem* instance;
 
 	public :
 		
-		void Generate();
+		static bool Initialize();
+		static void Final();
 
-		SoundEffectToolSystem* GetInstance();
-
+		// ウィンドウの生成
+		// 戻り値はバックバッファ
+		static const IntPtr CreateDxView(IntPtr windowHandle);
 	};
 }
