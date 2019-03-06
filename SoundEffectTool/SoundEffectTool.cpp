@@ -28,7 +28,8 @@ namespace SoundEffectTool {
 	const void* SoundEffectToolManager::CreateDxView(HWND windowHandle) {
 		auto renderer = make_unique<Renderer>();
 		renderer->Initialize(windowHandle);
-		_instance->_rendererList.emplace_back(move(renderer));
+		//_instance->_rendererList.emplace_back(move(renderer));
+		_instance->_renderer = move(renderer);
 		return renderer.get()->GetBackBuffer();
 	}
 }

@@ -21,7 +21,8 @@ namespace SoundEffectTool {
 
 		static SoundEffectToolManager* _instance;
 
-		vector<unique_ptr<Renderer>> _rendererList = Extensions::MakeUniqueVector<Renderer>();
+		//vector<unique_ptr<Renderer>> _rendererList = Extensions::MakeUniqueVector<Renderer>();
+		unique_ptr<Renderer> _renderer;
 
 	public:
 

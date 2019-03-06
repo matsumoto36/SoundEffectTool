@@ -29,7 +29,7 @@ namespace SoundEffectToolGUI {
 			SoundEffectToolHelper.Initialize();
 
 			//Dxlib黒画面表示
-			CompositionTarget.Rendering += CompositionTarget_Rendering;
+			//CompositionTarget.Rendering += CompositionTarget_Rendering;
 		}
 
 		private void CompositionTarget_Rendering(object sender, EventArgs e) {
