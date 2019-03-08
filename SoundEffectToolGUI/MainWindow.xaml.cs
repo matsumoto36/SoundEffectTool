@@ -22,29 +22,37 @@ namespace SoundEffectToolGUI {
 	/// </summary>
 	public partial class MainWindow : Window {
 
+		IntPtr _backBuffer;
+		IntPtr _renderer;
+
 		public MainWindow() {
 			InitializeComponent();
 
 			//システムセットアップ
 			SoundEffectToolHelper.Initialize();
 
-			//Dxlib黒画面表示
-			//CompositionTarget.Rendering += CompositionTarget_Rendering;
-		}
-
-		private void CompositionTarget_Rendering(object sender, EventArgs e) {
-
 			//ウィンドウハンドルを生成
 			var hwndSrc = new HwndSource(0, 0, 0, 0, 0, "DxLib", IntPtr.Zero);
 			D3DImage = new D3DImage();
 
-			var backBuffer = SoundEffectToolHelper.CreateDxView(hwndSrc.Handle);
+			_renderer = SoundEffectToolHelper.CreateDxView(hwndSrc.Handle, ref _backBuffer, (int)Image.Width, (int)Image.Height);
+
+			//Dxlib黒画面表示
+			CompositionTarget.Rendering += CompositionTarget_Rendering;
+		}
+
+		private void CompositionTarget_Rendering(object sender, EventArgs e) {
 
 			// バックバッファの設定
 			D3DImage.Lock();
-			D3DImage.SetBackBuffer(D3DResourceType.IDirect3DSurface9, backBuffer);
+			D3DImage.SetBackBuffer(D3DResourceType.IDirect3DSurface9, _backBuffer);
 			D3DImage.Unlock();
 			Image.Source = D3DImage;
+		}
+
+		private void Image_SizeChanged(object sender, SizeChangedEventArgs e) {
+			//描画のサイズも変更する
+			SoundEffectToolHelper.ChangeDrawSize(_renderer, (int)e.NewSize.Width, (int)e.NewSize.Height);
 		}
 
 		private void MenuItem_Click(object sender, RoutedEventArgs e) {
@@ -53,7 +61,7 @@ namespace SoundEffectToolGUI {
 
 		private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
 
-			SoundEffectToolHelper.Initialize();
+			SoundEffectToolHelper.Final();
 		}
 	}
 }

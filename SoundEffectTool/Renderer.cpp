@@ -10,7 +10,7 @@ namespace SoundEffectTool {
 	Renderer::Renderer() = default;
 	Renderer::~Renderer() = default;
 
-	void Renderer::Initialize(HWND hwnd) {
+	void Renderer::Initialize(HWND hwnd, int width, int height) {
 
 		// Dxライブラリ初期化設定
 		SetUseDirect3DVersion(DX_DIRECT3D_9EX);				// DirectX 9EXにする
@@ -18,7 +18,7 @@ namespace SoundEffectTool {
 		ChangeWindowMode(TRUE);								// ウィンドウモードに設定
 		SetWindowSizeChangeEnableFlag(TRUE);				// ウィンドウサイズを可変に
 
-		GetDefaultState(&_viewWidth, &_viewHeight, NULL);	//ウィンドウサイズを取得
+		GetDefaultState(&_viewWidth, &_viewHeight, NULL);	// デスクトップのウィンドウサイズを取得
 		SetGraphMode(_viewWidth, _viewHeight, 32);			// グラフィックモードの設定(最大)
 
 		SetAlwaysRunFlag(TRUE);								// 非アクティブ時も処理続行
@@ -31,6 +31,9 @@ namespace SoundEffectTool {
 
 		// Dxライブラリの初期化
 		if (DxLib_Init() == -1) return;
+
+		// ウィンドウサイズ変更
+		SetWindowSize(width, height);
 
 		// 背景色の設定
 		SetBackgroundColor(0, 0, 0);
@@ -46,5 +49,9 @@ namespace SoundEffectTool {
 		// D3DImageに描画するために
 		// バックバッファへのポインタを取得できるようにする
 		return  GetUseDirect3D9BackBufferSurface();
+	}
+
+	void Renderer::ChangeDrawSize(int width, int height) const {
+		SetWindowSize(width, height);
 	}
 }

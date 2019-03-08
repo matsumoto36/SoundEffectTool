@@ -21,9 +21,6 @@ namespace SoundEffectTool {
 
 		static SoundEffectToolManager* _instance;
 
-		//vector<unique_ptr<Renderer>> _rendererList = Extensions::MakeUniqueVector<Renderer>();
-		unique_ptr<Renderer> _renderer;
-
 	public:
 
 		static bool Initialize();
@@ -31,7 +28,7 @@ namespace SoundEffectTool {
 
 		// ウィンドウの生成
 		// 戻り値はバックバッファ
-		static const void* CreateDxView(HWND windowHandle);
+		static Renderer& CreateDxView(HWND, int, int, const void**);
 		
 	private:
 		

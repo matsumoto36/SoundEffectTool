@@ -12,7 +12,9 @@ namespace SoundEffectTool {
 		static void Final();
 
 		// ウィンドウの生成
-		// 戻り値はバックバッファ
-		static const IntPtr CreateDxView(IntPtr windowHandle);
+		static const IntPtr CreateDxView(IntPtr, IntPtr%, int, int);
+
+		// 描画サイズを変更する
+		static void ChangeDrawSize(IntPtr, int, int);
 	};
 }

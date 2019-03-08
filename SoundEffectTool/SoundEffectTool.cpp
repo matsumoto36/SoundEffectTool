@@ -23,13 +23,11 @@ namespace SoundEffectTool {
 		if(_instance) delete _instance;
 	}
 
-	// ウィンドウの生成
-	// 戻り値はバックバッファ
-	const void* SoundEffectToolManager::CreateDxView(HWND windowHandle) {
+	Renderer& SoundEffectToolManager::CreateDxView(HWND windowHandle, int width, int height, const void** backBuffer) {
 		auto renderer = make_unique<Renderer>();
-		renderer->Initialize(windowHandle);
-		//_instance->_rendererList.emplace_back(move(renderer));
-		_instance->_renderer = move(renderer);
-		return renderer.get()->GetBackBuffer();
+		renderer->Initialize(windowHandle, width, height);
+		auto bb = renderer->GetBackBuffer();
+		*backBuffer = bb;
+		return *renderer;
 	}
 }
