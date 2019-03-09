@@ -18,8 +18,8 @@ namespace SoundEffectTool {
 		ChangeWindowMode(TRUE);								// ウィンドウモードに設定
 		SetWindowSizeChangeEnableFlag(TRUE);				// ウィンドウサイズを可変に
 
-		GetDefaultState(&_viewWidth, &_viewHeight, NULL);	// デスクトップのウィンドウサイズを取得
-		SetGraphMode(_viewWidth, _viewHeight, 32);			// グラフィックモードの設定(最大)
+		GetDefaultState(&_maxWidth, &_maxHeight, NULL);	// デスクトップのウィンドウサイズを取得
+		SetGraphMode(_maxWidth, _maxHeight, 32);			// グラフィックモードの設定(最大)
 
 		SetAlwaysRunFlag(TRUE);								// 非アクティブ時も処理続行
 		SetDrawScreen(DX_SCREEN_BACK);						// 描画先をバックバッファへ設定
@@ -53,5 +53,16 @@ namespace SoundEffectTool {
 
 	void Renderer::ChangeDrawSize(int width, int height) const {
 		SetWindowSize(width, height);
+	}
+
+	void Renderer::Draw() const {
+
+		//画面を消す
+		ClearDrawScreen();
+
+		// デバッグ
+		DrawBox(0, 0, 10, 10, GetColor(255, 0, 0), 1);
+
+		ScreenFlip();
 	}
 }

@@ -8,26 +8,18 @@
 
 namespace SoundEffectTool {
 
-	SoundEffectToolManager* SoundEffectToolManager::_instance;
-
 	SoundEffectToolManager::SoundEffectToolManager()
 	{}
 
 	SoundEffectToolManager::~SoundEffectToolManager() {}
 
-	bool SoundEffectToolManager::Initialize() {
-		_instance = new SoundEffectToolManager();
-		return true;
-	}
-	void SoundEffectToolManager::Final() {
-		if(_instance) delete _instance;
-	}
-
-	Renderer& SoundEffectToolManager::CreateDxView(HWND windowHandle, int width, int height, const void** backBuffer) {
+	void SoundEffectToolManager::CreateDxView(HWND windowHandle, string rendererName, int width, int height) {
 		auto renderer = make_unique<Renderer>();
 		renderer->Initialize(windowHandle, width, height);
-		auto bb = renderer->GetBackBuffer();
-		*backBuffer = bb;
-		return *renderer;
+		_rendererList.emplace(rendererName, move(renderer));
+	}
+
+	Renderer& SoundEffectToolManager::GetRenderer(string rendererName) {
+		return *_rendererList[rendererName];
 	}
 }

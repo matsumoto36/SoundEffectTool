@@ -171,7 +171,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Extensions.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="SoundEffectTool.h" />
@@ -180,7 +179,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
-    <ClCompile Include="Extensions.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="SoundEffectTool.cpp" />
     <ClCompile Include="stdafx.cpp">

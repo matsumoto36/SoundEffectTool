@@ -1,20 +1,37 @@
 ﻿#pragma once
 
+using System::ComponentModel::INotifyPropertyChanged;
+using System::ComponentModel::PropertyChangedEventArgs;
+using System::ComponentModel::PropertyChangedEventHandler;
+
 using namespace System;
 
 namespace SoundEffectTool {
 
-	public ref class SoundEffectToolHelper {
+	public ref class SoundEffectToolVM : public INotifyPropertyChanged {
+
+		SoundEffectToolManager* _manager;
 
 	public :
-		
-		static bool Initialize();
-		static void Final();
 
+		// INotifyPropertyChanged を介して継承されました
+		virtual event System::ComponentModel::PropertyChangedEventHandler ^PropertyChanged;
+
+		SoundEffectToolVM();
+		~SoundEffectToolVM();
+		!SoundEffectToolVM();
+		
 		// ウィンドウの生成
-		static const IntPtr CreateDxView(IntPtr, IntPtr%, int, int);
+		void CreateDxView(IntPtr windowHandle, String^ windowName, int width, int height);
+
+		// 対象のウィンドウのバックバッファを取得する
+		const IntPtr GetBackBuffer(String^ windowName);
 
 		// 描画サイズを変更する
-		static void ChangeDrawSize(IntPtr, int, int);
+		void ChangeDrawSize(String^ windowName, int width, int height);
+
+		// 描画する
+		void Draw(String^ windowName);
+
 	};
 }

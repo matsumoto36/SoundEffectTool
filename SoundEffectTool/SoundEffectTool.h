@@ -4,9 +4,9 @@
 
 #include <vector>
 #include <memory>
+#include <map>
 
 #include "Renderer.h"
-#include "Extensions.h"
 
 namespace AudioLibrary {
 	class Audio;
@@ -19,21 +19,23 @@ namespace SoundEffectTool {
 
 	class SOUNDEFFECTTOOL_API SoundEffectToolManager final sealed {
 
-		static SoundEffectToolManager* _instance;
+		map<string, unique_ptr<Renderer>> _rendererList;
 
 	public:
 
-		static bool Initialize();
-		static void Final();
+		// コピーは禁止するが、ムーブは許可する
+		SoundEffectToolManager(const SoundEffectToolManager&) = delete;
+		SoundEffectToolManager& operator=(const SoundEffectToolManager&) = delete;
 
-		// ウィンドウの生成
-		// 戻り値はバックバッファ
-		static Renderer& CreateDxView(HWND, int, int, const void**);
-		
-	private:
-		
 		SoundEffectToolManager();
 		~SoundEffectToolManager();
+		
+		// ウィンドウの生成
+		void CreateDxView(HWND windowHandle, string rendererName, int width, int height);
+
+		Renderer& GetRenderer(string rendererName);
+		
+	private:
 
 	};
 }

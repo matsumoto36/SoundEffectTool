@@ -3,28 +3,39 @@
 #include <Windows.h>
 #include "SoundEffectTool.h"
 #include "ClassLibrary.h"
+#include "Extensions.h"
 
 namespace SoundEffectTool {
 
-	bool SoundEffectToolHelper::Initialize() {
-		return SoundEffectToolManager::Initialize();
+	SoundEffectToolVM::SoundEffectToolVM()
+		: _manager(new SoundEffectToolManager()) {}
+
+	SoundEffectToolVM::~SoundEffectToolVM() {
+		this->!SoundEffectToolVM();
 	}
 
-	void SoundEffectToolHelper::Final() {
-		SoundEffectToolManager::Final();
+	SoundEffectToolVM::!SoundEffectToolVM() {
+		delete _manager;
 	}
 
-	const IntPtr SoundEffectToolHelper::CreateDxView(IntPtr windowHandle, IntPtr% backBuffer, int width, int height) {
+	void SoundEffectToolVM::CreateDxView(IntPtr windowHandle, String^ windowName, int width, int height) {
 		auto hwnd = reinterpret_cast<HWND>(windowHandle.ToPointer());
 		const void* bb = nullptr;
-		auto renderer = SoundEffectToolManager::CreateDxView(hwnd, width, height, &bb);
-		backBuffer = IntPtr(const_cast<void*>(bb));
-		auto ptr = move(renderer);
-		return IntPtr(&ptr);
+		_manager->CreateDxView(hwnd, StringConvert::ToStdString(windowName), width, height);
 	}
 
-	void SoundEffectToolHelper::ChangeDrawSize(IntPtr renderer, int width, int height) {
-		auto r = reinterpret_cast<Renderer*>(renderer.ToPointer());
-		r->ChangeDrawSize(width, height);
+	const IntPtr SoundEffectToolVM::GetBackBuffer(String^ windowName) {
+		auto renderer = _manager->GetRenderer(StringConvert::ToStdString(windowName));
+		return IntPtr(const_cast<void*>(renderer.GetBackBuffer()));
+	}
+
+	void SoundEffectToolVM::ChangeDrawSize(String^ windowName, int width, int height) {
+		auto renderer = _manager->GetRenderer(StringConvert::ToStdString(windowName));
+		renderer.ChangeDrawSize(width, height);
+	}
+
+	void SoundEffectToolVM::Draw(String^ windowName) {
+		auto renderer = _manager->GetRenderer(StringConvert::ToStdString(windowName));
+		renderer.Draw();
 	}
 }

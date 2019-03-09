@@ -114,7 +114,7 @@
   <ItemGroup>
     <ProjectReference Include="..\ClassLibrary\ClassLibrary.vcxproj">
       <Project>{4abb5c0f-f6ad-4c40-985b-2e6f0338911f}</Project>
-      <Name>ClassLibrary</Name>
+      <Name>SoundEffectToolVM</Name>
       <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
