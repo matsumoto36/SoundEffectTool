@@ -20,7 +20,6 @@ namespace SoundEffectTool {
 
 	void SoundEffectToolVM::CreateDxView(IntPtr windowHandle, String^ windowName, int width, int height) {
 		auto hwnd = reinterpret_cast<HWND>(windowHandle.ToPointer());
-		const void* bb = nullptr;
 		_manager->CreateDxView(hwnd, StringConvert::ToStdString(windowName), width, height);
 	}
 

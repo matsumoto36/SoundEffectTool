@@ -21,6 +21,7 @@ namespace SoundEffectTool {
 
 		map<string, unique_ptr<Renderer>> _rendererList;
 
+
 	public:
 
 		// コピーは禁止するが、ムーブは許可する

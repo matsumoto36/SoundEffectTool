@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -24,6 +25,7 @@ namespace SoundEffectToolGUI {
 
 		private SoundEffectToolVM _soundEffectToolVM;
 		private string _windowName = "DxLib";
+		private TimeSpan _lastRender;
 
 		public MainWindow() {
 			InitializeComponent();
@@ -31,12 +33,42 @@ namespace SoundEffectToolGUI {
 			_soundEffectToolVM = new SoundEffectToolVM();
 			DataContext = _soundEffectToolVM;
 
-			SetUpD3DImage();
+		}
+
+		private void Image_Loaded(object sender, RoutedEventArgs e) {
+
+			// ウィンドウハンドルを生成
+			var hwndSrc = new HwndSource(0, 0, 0, 0, 0, "DxLib", IntPtr.Zero);
+
+			_soundEffectToolVM.CreateDxView(hwndSrc.Handle, _windowName, (int)Image.Width, (int)Image.Height);
+
+			D3DImage = new D3DImage();
+			Image.Source = D3DImage;
+
+			// 描画の更新
+			CompositionTarget.Rendering += UpdateRendering;
+			D3DImage.IsFrontBufferAvailableChanged += D3DImage_IsFrontBufferAvailableChanged;
+
 		}
 
 		private void Image_SizeChanged(object sender, SizeChangedEventArgs e) {
 			//描画のサイズも変更する
-			_soundEffectToolVM.ChangeDrawSize(_windowName, (int)e.NewSize.Width, (int)e.NewSize.Height);
+			//_soundEffectToolVM.ChangeDrawSize(_windowName, (int)e.NewSize.Width, (int)e.NewSize.Height);
+		}
+
+		/// <summary>
+		/// フロントバッファの更新
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void D3DImage_IsFrontBufferAvailableChanged(object sender, DependencyPropertyChangedEventArgs e) {
+
+			if(D3DImage.IsFrontBufferAvailable) {
+				CompositionTarget.Rendering += UpdateRendering;
+			}
+			else {
+				CompositionTarget.Rendering -= UpdateRendering;
+			}
 		}
 
 		private void MenuItem_Click(object sender, RoutedEventArgs e) {
@@ -47,23 +79,27 @@ namespace SoundEffectToolGUI {
 			//SoundEffectToolHelper.Final();
 		}
 
-		private void SetUpD3DImage() {
+		private void UpdateRendering(object sender, EventArgs e) {
 
-			//ウィンドウハンドルを生成
-			var hwndSrc = new HwndSource(0, 0, 0, 0, 0, "DxLib", IntPtr.Zero);
-			D3DImage = new D3DImage();
+			var args = (RenderingEventArgs)e;
+			if(D3DImage.IsFrontBufferAvailable && _lastRender != args.RenderingTime) {
 
-			_soundEffectToolVM.CreateDxView(hwndSrc.Handle, _windowName, (int)Image.Width, (int)Image.Height);
-			var backBuffer = _soundEffectToolVM.GetBackBuffer(_windowName);
+				IntPtr backBuffer = _soundEffectToolVM.GetBackBuffer(_windowName);
+				if(backBuffer != IntPtr.Zero) {
 
-			CompositionTarget.Rendering += (s, e) => {
+					D3DImage.Lock();
 
-				// バックバッファの設定
-				D3DImage.Lock();
-				D3DImage.SetBackBuffer(D3DResourceType.IDirect3DSurface9, backBuffer);
-				D3DImage.Unlock();
-				Image.Source = D3DImage;
-			};
+					// バックバッファの設定
+					D3DImage.SetBackBuffer(D3DResourceType.IDirect3DSurface9, backBuffer);
+					// 描画
+					_soundEffectToolVM.Draw(_windowName);
+					D3DImage.AddDirtyRect(new Int32Rect(0, 0, D3DImage.PixelWidth, D3DImage.PixelHeight));
+
+					D3DImage.Unlock();
+
+					_lastRender = args.RenderingTime;
+				}
+			}
 		}
 	}
 }

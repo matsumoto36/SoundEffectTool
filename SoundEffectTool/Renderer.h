@@ -23,7 +23,7 @@ namespace SoundEffectTool {
 		const void* GetBackBuffer() const;
 
 		// 描画のサイズを変更する
-		void ChangeDrawSize(int width, int height) const;
+		void ChangeDrawSize(int width, int height);
 
 		// 描画を更新する
 		void Draw() const;

@@ -36,7 +36,7 @@ namespace SoundEffectTool {
 		SetWindowSize(width, height);
 
 		// 背景色の設定
-		SetBackgroundColor(0, 0, 0);
+		SetBackgroundColor(32, 32, 32);
 	}
 
 	void Renderer::Finalize() {
@@ -48,11 +48,13 @@ namespace SoundEffectTool {
 	const void* Renderer::GetBackBuffer() const {
 		// D3DImageに描画するために
 		// バックバッファへのポインタを取得できるようにする
-		return  GetUseDirect3D9BackBufferSurface();
+		return GetUseDirect3D9BackBufferSurface();
 	}
 
-	void Renderer::ChangeDrawSize(int width, int height) const {
+	void Renderer::ChangeDrawSize(int width, int height) {
 		SetWindowSize(width, height);
+		_width = width;
+		_height = height;
 	}
 
 	void Renderer::Draw() const {
@@ -61,7 +63,7 @@ namespace SoundEffectTool {
 		ClearDrawScreen();
 
 		// デバッグ
-		DrawBox(0, 0, 10, 10, GetColor(255, 0, 0), 1);
+		DrawBox(0, 0, 100, 100, GetColor(255, 0, 0), 1);
 
 		ScreenFlip();
 	}

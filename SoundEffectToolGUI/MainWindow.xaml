@@ -11,20 +11,22 @@
         Closing="Window_Closing">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition />
+            <RowDefinition Height="Auto"/>  <!--Menu-->
+            <RowDefinition/>                <!--Contents-->
+            <RowDefinition Height="Auto"/>  <!--StatusBar-->
         </Grid.RowDefinitions>
-        <Menu>
+        <Menu Grid.Row="0">
             <MenuItem Header="TestPlaySound" />
             <MenuItem Header="ヘルプ">
                 <MenuItem Header="情報" Click="MenuItem_Click" />
             </MenuItem>
         </Menu>
-        <xcad:DockingManager Grid.Row="1"
-                           AllowMixedOrientation="True"
-                           BorderBrush="Black"
-                           BorderThickness="1"
-                           Theme="{Binding ElementName=_themeCombo, Path=SelectedItem.Tag}">
+        <xcad:DockingManager
+                            Grid.Row="1"
+                            AllowMixedOrientation="True"
+                            BorderBrush="Black"
+                            BorderThickness="1"
+                            Theme="{Binding ElementName=_themeCombo, Path=SelectedItem.Tag}">
             <xcad:DockingManager.DocumentHeaderTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Horizontal">
@@ -34,28 +36,35 @@
                 </DataTemplate>
             </xcad:DockingManager.DocumentHeaderTemplate>
             <xcad:LayoutRoot x:Name="_layoutRoot">
-                <xcad:LayoutPanel Orientation="Horizontal">
-                    <xcad:LayoutAnchorablePane DockWidth="200">
-                        <xcad:LayoutAnchorable ContentId="left" Title="Left" AutoHideWidth="240">
+                <xcad:LayoutPanel Orientation="Vertical">
+                    
+                    <xcad:LayoutAnchorablePane DockHeight="60">
+                        <xcad:LayoutAnchorable ContentId="control" Title="Control">
                         </xcad:LayoutAnchorable>
                     </xcad:LayoutAnchorablePane>
- 
-                    <xcad:LayoutAnchorablePane DockWidth="125">
-                        <xcad:LayoutAnchorable ContentId="center" Title="Center" >
-                            <Image x:Name="Image" Height="Auto" SizeChanged="Image_SizeChanged" Stretch="None">
-                                <Image.Source>
-                                    <i:D3DImage x:Name="D3DImage"></i:D3DImage>
-                                </Image.Source>
-                            </Image>
-                        </xcad:LayoutAnchorable>
-                    </xcad:LayoutAnchorablePane>
+                    
+                    <xcad:LayoutPanel Orientation="Horizontal">
 
-                    <xcad:LayoutAnchorablePane DockWidth="125">
-                        <xcad:LayoutAnchorable ContentId="right" Title="Right" >
-                        </xcad:LayoutAnchorable>
-                    </xcad:LayoutAnchorablePane>
+                        <xcad:LayoutAnchorablePane DockWidth="125" DockHeight="Auto">
+                            <xcad:LayoutAnchorable ContentId="effect" Title="Effect" >
+                            </xcad:LayoutAnchorable>
+                        </xcad:LayoutAnchorablePane>
+
+                        <xcad:LayoutAnchorablePane DockWidth="125" DockHeight="Auto">
+                            <xcad:LayoutAnchorable ContentId="wave" Title="Wave" >
+                                <Image x:Name="Image" Height="Auto" Loaded="Image_Loaded" SizeChanged="Image_SizeChanged" Stretch="None">
+                                    <Image.Source>
+                                        <i:D3DImage x:Name="D3DImage"></i:D3DImage>
+                                    </Image.Source>
+                                </Image>
+                            </xcad:LayoutAnchorable>
+                        </xcad:LayoutAnchorablePane>
+                    </xcad:LayoutPanel>
                 </xcad:LayoutPanel>
             </xcad:LayoutRoot>
         </xcad:DockingManager>
+        <StatusBar Grid.Row="2">
+            <StatusBarItem Content="aaaa"/>
+        </StatusBar>
     </Grid>
 </Window>
