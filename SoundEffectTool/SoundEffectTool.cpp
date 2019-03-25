@@ -4,7 +4,7 @@
 #include "stdafx.h"
 
 #include "SoundEffectTool.h"
-#include "AudioLibrary.h"
+#include "Audio.h"
 
 namespace SoundEffectTool {
 

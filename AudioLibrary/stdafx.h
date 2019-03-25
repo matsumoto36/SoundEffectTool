@@ -14,3 +14,5 @@
 
 
 // プログラムに必要な追加ヘッダーをここで参照してください
+#define AUDIOLIBRARY_API __declspec(dllexport)
+#include <xaudio2.h>

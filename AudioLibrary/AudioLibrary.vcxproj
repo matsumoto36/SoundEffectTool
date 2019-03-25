@@ -157,12 +157,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="AudioLibrary.h" />
+    <ClInclude Include="Audio.h" />
+    <ClInclude Include="AudioData.h" />
+    <ClInclude Include="AudioLoader.h" />
+    <ClInclude Include="AudioPlayer.h" />
+    <ClInclude Include="SoundDefine.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="WAVFileReader.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="AudioLibrary.cpp" />
+    <ClCompile Include="Audio.cpp" />
+    <ClCompile Include="AudioData.cpp" />
+    <ClCompile Include="AudioLoader.cpp" />
+    <ClCompile Include="AudioPlayer.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -170,6 +178,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="WAVFileReader.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
