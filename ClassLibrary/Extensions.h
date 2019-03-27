@@ -4,15 +4,18 @@
 #include <msclr/marshal_cppstd.h>
 
 // ägí£ä÷êîÇÇ‹Ç∆ÇﬂÇΩÇ‡ÇÃ
-class StringConvert {
+static std::string ToStdString(System::String^ str) {
+	return msclr::interop::marshal_as<std::string>(str);
+}
 
-public :
+static System::String^ ToSystemString(std::string str) {
+	return msclr::interop::marshal_as<System::String^>(str);
+}
 
-	static std::string ToStdString(System::String^ str) {
-		return msclr::interop::marshal_as<std::string>(str);
-	}
+static std::wstring ToStdWString(System::String^ str) {
+	return msclr::interop::marshal_as<std::wstring>(str);
+}
 
-	static System::String^ ToSystemString(std::string str) {
-		return msclr::interop::marshal_as<System::String^>(str);
-	}
-};
+static System::String^ ToSystemWString(std::wstring str) {
+	return msclr::interop::marshal_as<System::String^>(str);
+}

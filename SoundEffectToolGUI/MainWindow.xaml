@@ -16,7 +16,7 @@
             <RowDefinition Height="Auto"/>  <!--StatusBar-->
         </Grid.RowDefinitions>
         <Menu Grid.Row="0">
-            <MenuItem Header="TestPlaySound" />
+            <MenuItem Header="TestPlaySound" Click="TestPlaySound" />
             <MenuItem Header="ヘルプ">
                 <MenuItem Header="情報" Click="MenuItem_Click" />
             </MenuItem>

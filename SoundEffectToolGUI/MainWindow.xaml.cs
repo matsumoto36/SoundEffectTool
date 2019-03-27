@@ -101,5 +101,9 @@ namespace SoundEffectToolGUI {
 				}
 			}
 		}
+
+		private void TestPlaySound(object sender, RoutedEventArgs e) {
+			_soundEffectToolVM.PlaySoundFromFile("Resource/Audio/MusicSurround.wav");
+		}
 	}
 }

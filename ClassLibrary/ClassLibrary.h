@@ -3,10 +3,10 @@
 using System::ComponentModel::INotifyPropertyChanged;
 using System::ComponentModel::PropertyChangedEventArgs;
 using System::ComponentModel::PropertyChangedEventHandler;
-
 using namespace System;
 
 namespace SoundEffectTool {
+
 
 	public ref class SoundEffectToolVM : public INotifyPropertyChanged {
 
@@ -32,6 +32,9 @@ namespace SoundEffectTool {
 
 		// 描画する
 		void Draw(String^ windowName);
+
+		// 音声を再生
+		void PlaySoundFromFile(String^ windowName);
 
 	};
 }
