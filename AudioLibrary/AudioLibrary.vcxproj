@@ -153,23 +153,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="src\AudioResource.h" />
     <ClInclude Include="include\Audio.h" />
     <ClInclude Include="include\AudioData.h" />
-    <ClInclude Include="include\AudioDefine.h" />
+    <ClInclude Include="src\AudioDefine.h" />
     <ClInclude Include="include\AudioLoader.h" />
     <ClInclude Include="include\AudioPlayer.h" />
-    <ClInclude Include="src\Audio.h" />
-    <ClInclude Include="src\AudioData.h" />
-    <ClInclude Include="src\AudioDefine.h" />
-    <ClInclude Include="src\AudioLoader.h" />
-    <ClInclude Include="src\AudioPlayer.h" />
     <ClInclude Include="src\stdafx.h" />
     <ClInclude Include="src\targetver.h" />
     <ClInclude Include="src\WAVFileReader.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\AudioResource.cpp" />
     <ClCompile Include="src\Audio.cpp" />
     <ClCompile Include="src\AudioData.cpp" />
     <ClCompile Include="src\AudioLoader.cpp" />

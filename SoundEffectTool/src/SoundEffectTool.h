@@ -19,7 +19,6 @@ namespace SoundEffectTool {
 	class SOUNDEFFECTTOOL_API SoundEffectToolManager final sealed {
 
 		map<string, unique_ptr<Renderer>> _rendererList;
-		AudioPlayer& _audioPlayer;
 
 	public:
 

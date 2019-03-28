@@ -5,6 +5,10 @@
 
 #include <string>
 
+#include <vector>
+#include <memory>
+#include <map>
+
 #include "SoundEffectToolDefine.h"
 #include "Renderer.h"
 
@@ -13,6 +17,8 @@ using namespace std;
 namespace SoundEffectTool {
 
 	class SOUNDEFFECTTOOL_API SoundEffectToolManager final sealed {
+
+		map<string, unique_ptr<Renderer>> _rendererList;
 
 	public:
 

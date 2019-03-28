@@ -10,22 +10,21 @@ namespace SoundEffectTool {
 	SoundEffectToolManager::SoundEffectToolManager() {
 		
 		// サウンドシステムの初期化
-		auto&& audio = Audio::GetInstance();
-		audio.Initialize();
+		//auto&& audio = Audio::GetInstance();
+		//audio.Initialize();
 
 		// プレーヤーを作る
-		auto player = audio.CreateAudioPlayer();
-		_audioPlayer = move(player);
-
+		//auto player = audio.CreateAudioPlayer();
+		//_audioPlayer = move(player);
 	}
 
 	SoundEffectToolManager::~SoundEffectToolManager() {
 	
 		// プレイヤーの破棄
-		_audioPlayer.reset();
+		//_audioPlayer.reset();
 
 		// サウンドシステムの破棄
-		Audio::GetInstance().Finalize();
+		//Audio::GetInstance().Finalize();
 
 	}
 
@@ -46,9 +45,9 @@ namespace SoundEffectTool {
 		if (!audioData) return;
 		
 		// データをセット
-		_audioPlayer->SetAudioData(audioData);
+		//_audioPlayer->SetAudioData(audioData);
 		// 再生
-		_audioPlayer->Play();
+		//_audioPlayer->Play();
 	}
 
 }

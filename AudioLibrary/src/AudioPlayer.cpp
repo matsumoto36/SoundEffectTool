@@ -9,9 +9,7 @@ namespace AudioLibrary {
 		_audioData(nullptr) {
 	}
 
-	AudioPlayer::~AudioPlayer() {
-
-	}
+	AudioPlayer::~AudioPlayer() { }
 
 	HRESULT AudioPlayer::SetAudioData(const shared_ptr<AudioData>& audioData) {
 

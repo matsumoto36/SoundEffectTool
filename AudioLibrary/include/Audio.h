@@ -1,12 +1,8 @@
 #pragma once
 
-// unique_ptr使用につき
-#pragma warning(disable:4251)
-
 #include <memory>
 #include <string>
 
-#include "AudioDefine.h"
 #include "AudioLoader.h"
 #include "AudioPlayer.h"
 
@@ -17,6 +13,15 @@ namespace AudioLibrary {
 	// サウンドシステムを管理するクラス
 	class AUDIOLIBRARY_API Audio final sealed {
 
+		static Audio& _instance;					// singleton
+		static bool _isInitialized;					// 初期化が完了しているか
+
+		class Impl;
+		unique_ptr<Impl> _impl;
+
+		Audio();
+		~Audio() { Finalize(); }
+
 	public:
 
 		static Audio& GetInstance();
@@ -25,7 +30,7 @@ namespace AudioLibrary {
 		void Finalize();
 
 		// プレーヤーを作成する
-		AudioPlayerHandler CreateAudioPlayer();
+		unique_ptr<AudioPlayer, AudioPlayerDeleter> CreateAudioPlayer();
 
 		// 音声ファイルを読み込む
 		shared_ptr<AudioData> LoadAudioData(const wstring& filePath);
