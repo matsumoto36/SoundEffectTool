@@ -14,6 +14,10 @@
 #define AUDIOLIBRARY_API __declspec(dllexport)
 
 // プログラムに必要な追加ヘッダーをここで参照してください
+
+// XAudio2
+#define XAUDIO2_HELPER_FUNCTIONS
+
 #if (_WIN32_WINNT >= 0x0602 /*_WIN32_WINNT_WIN8*/)
 #include <xaudio2.h>
 #pragma comment(lib,"xaudio2.lib")
@@ -21,3 +25,4 @@
 #include <C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include\comdecl.h>
 #include <C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include\xaudio2.h>
 #endif
+

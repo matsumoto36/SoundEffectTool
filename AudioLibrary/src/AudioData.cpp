@@ -31,4 +31,8 @@ namespace AudioLibrary {
 	const XAUDIO2_BUFFER& AudioData::GetBuffer() const {
 		return _impl->_buffer;
 	}
+
+	//const unique_ptr<uint8_t[]>& GetWave(int channel) const {
+
+	//}
 }

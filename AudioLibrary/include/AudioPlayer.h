@@ -1,5 +1,6 @@
 #pragma once
 
+#include <math.h>
 #include <memory>
 
 #include "AudioDefine.h"
@@ -11,19 +12,35 @@ namespace AudioLibrary {
 	class AUDIOLIBRARY_API AudioPlayer {
 
 	private:
+			
+		bool _isPlay;		// 再生しているか
+		float _volume;		// 現在の音量
 
-		IXAudio2& _xAudio2;
-		IXAudio2SourceVoice* _sourceVoice;	// ソースボイス
-		shared_ptr<AudioData> _audioData;	// 再生する音声データ
+		struct Impl;
+		unique_ptr<Impl> _impl;
 
 	public:
-		AudioPlayer(IXAudio2& xAudio2);
+		AudioPlayer(IXAudio2& xAudio2, float volume = 1.0f);
 		~AudioPlayer();
 
 		// コピーは禁止するが、ムーブは許可する
 		AudioPlayer(const AudioPlayer&) = delete;
-		AudioPlayer(AudioPlayer&&) noexcept = default;
+		AudioPlayer(AudioPlayer&&) noexcept;
 		AudioPlayer& operator=(const AudioPlayer&) = delete;
+
+		// 現在音声を再生しているか
+		bool IsPlay() const {
+			return _isPlay;
+		}
+
+		float GetVolume() const {
+			return _volume;
+		}
+
+		void SetVolume(float volume);
+
+		// 再生システムの情報を更新する
+		void Update();
 
 		// プレイヤーに音声データを入力する
 		HRESULT SetAudioData(const shared_ptr<AudioData>& audioData);
@@ -31,19 +48,17 @@ namespace AudioLibrary {
 		// プレイヤーから音声データを削除する
 		void UnSetAudioData();
 
-		// 現在音声を再生しているか
-		bool IsPlay();
-
 		// 音を再生する
-		HRESULT Play();
+		HRESULT Play() const;
 
 		// 音を止める
-		HRESULT Stop();
+		HRESULT Stop() const;
 
 		// 音をポーズする
-		HRESULT Pause();
+		HRESULT Pause() const;
 	};
 
+	// プレイヤーのデリーター
 	struct AudioPlayerDeleter {
 		void operator()(AudioPlayer* player) const {
 			// 再生中なら止める

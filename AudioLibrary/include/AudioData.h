@@ -34,5 +34,8 @@ namespace AudioLibrary {
 	
 		// バッファを返す
 		const XAUDIO2_BUFFER& GetBuffer() const;
+
+		// 指定したチャンネルの波形を取得する
+		//const unique_ptr<uint8_t[]>& GetWave(int channel) const;
 	};
 }
