@@ -3,8 +3,6 @@
 // unique_ptr使用につき
 #pragma warning(disable:4251)
 
-#include <string>
-
 #include <vector>
 #include <memory>
 #include <map>
@@ -13,12 +11,16 @@
 #include "Renderer.h"
 
 using namespace std;
+using namespace AudioLibrary;
 
 namespace SoundEffectTool {
 
 	class SOUNDEFFECTTOOL_API SoundEffectToolManager final sealed {
 
 		map<string, unique_ptr<Renderer>> _rendererList;
+
+		class Impl;
+		unique_ptr<Impl> _impl;
 
 	public:
 
@@ -28,7 +30,7 @@ namespace SoundEffectTool {
 
 		SoundEffectToolManager();
 		~SoundEffectToolManager();
-
+		
 		// ウィンドウの生成
 		void CreateDxView(HWND windowHandle, string& rendererName, int width, int height);
 

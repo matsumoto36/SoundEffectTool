@@ -1,9 +1,10 @@
 #include "stdafx.h"
-#include "AudioLoader.h"
 
+#include "../include/AudioLoader.h"
 #include "WAVFileReader.h"
 
 namespace AudioLibrary {
+
 
 	HRESULT AudioLoader::LoadWaveFile(const IXAudio2& xAudio2, const wstring& filePath, shared_ptr<AudioData>& retAudioData) {
 
@@ -21,7 +22,6 @@ namespace AudioLibrary {
 		// ファイル読み込み・パース
 		unique_ptr<uint8_t[]> waveFile;
 		DirectX::WAVData waveData;
-
 		// DirectX::LoadWAVAudioFromFileExはサンプルを拝借
 		if (FAILED(hr = DirectX::LoadWAVAudioFromFileEx(fullPath.c_str(), waveFile, waveData))) {
 			wprintf(L"Failed reading WAV file: %#X (%s)\n", hr, fullPath.c_str());
@@ -42,8 +42,9 @@ namespace AudioLibrary {
 		}
 
 		// 返却
-		auto wfx = unique_ptr<WAVEFORMATEX>(const_cast<WAVEFORMATEX*>(waveData.wfx));
-		retAudioData = move(make_shared<AudioData>(move(wfx), move(waveFile), buffer));
+		auto ex = make_unique<WAVEFORMATEX>();
+		auto&& a = *waveData.wfx;
+		retAudioData = move(make_shared<AudioData>(a, move(waveFile), buffer));
 
 		return hr;
 	}

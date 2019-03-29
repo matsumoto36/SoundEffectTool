@@ -10,14 +10,11 @@ namespace AudioLibrary {
 	// 音声データを再生するクラス
 	class AUDIOLIBRARY_API AudioPlayer {
 
-	public:
-
 	private:
 
 		IXAudio2& _xAudio2;
-		
-		shared_ptr<AudioData> _audioData;	// 再生する音声データ
 		IXAudio2SourceVoice* _sourceVoice;	// ソースボイス
+		shared_ptr<AudioData> _audioData;	// 再生する音声データ
 
 	public:
 		AudioPlayer(IXAudio2& xAudio2);

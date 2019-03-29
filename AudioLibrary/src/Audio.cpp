@@ -9,18 +9,20 @@
 
 namespace AudioLibrary {
 
-	class Audio::Impl {
-	public:
-		unique_ptr<IXAudio2> _xAudio2;						// XAudio2のシステム
-		unique_ptr<IXAudio2MasteringVoice> _masteringVoice;	// マスターボイス
-	};
+	void XAudio2Deleter::operator()(IXAudio2* xaudio2) const {
+		xaudio2->Release();
+	}
+
+	void MasteringVoiceDeleter::operator()(IXAudio2MasteringVoice* masteringVoice) const {
+		masteringVoice->DestroyVoice();
+	}
 
 	// インスタンスだけ先に作っておく
 	Audio& Audio::_instance = GetInstance();
 	bool Audio::_isInitialized = false;
 
-	Audio::Audio() :
-		_impl(new Audio::Impl()) {}
+	Audio::Audio() {}
+	Audio::~Audio() {}
 
 	Audio& Audio::GetInstance() {
 		static Audio audio;
@@ -36,8 +38,6 @@ namespace AudioLibrary {
 			return;
 		}
 
-		return;
-
 		// COMの初期化
 		CoInitializeEx(nullptr, COINITBASE_MULTITHREADED);
 
@@ -51,7 +51,7 @@ namespace AudioLibrary {
 				CoUninitialize();
 				return;
 			}
-			_impl->_xAudio2 = unique_ptr<IXAudio2>(xAudio2);
+			_xAudio2 = unique_ptr<IXAudio2, XAudio2Deleter>(xAudio2);
 
 		}
 
@@ -59,19 +59,19 @@ namespace AudioLibrary {
 		XAUDIO2_DEBUG_CONFIGURATION debug = { 0 };
 		debug.TraceMask = XAUDIO2_LOG_ERRORS | XAUDIO2_LOG_WARNINGS;
 		debug.BreakMask = XAUDIO2_LOG_ERRORS;
-		_impl->_xAudio2->SetDebugConfiguration(&debug, 0);
+		_xAudio2->SetDebugConfiguration(&debug, 0);
 		#endif
 
 		// マスターボイスの作成
 		{
 			IXAudio2MasteringVoice* masteringVoice = nullptr;
-			if (FAILED(hr = _impl->_xAudio2->CreateMasteringVoice(&masteringVoice))) {
+			if (FAILED(hr = _xAudio2->CreateMasteringVoice(&masteringVoice))) {
 				wprintf(L"Failed creating mastering voice: %#X\n", hr);
-				_impl->_xAudio2->Release();
+				_xAudio2->Release();
 				CoUninitialize();
 				return;
 			}
-			_impl->_masteringVoice = unique_ptr<IXAudio2MasteringVoice>(masteringVoice);
+			_masteringVoice = unique_ptr<IXAudio2MasteringVoice, MasteringVoiceDeleter>(masteringVoice);
 		}
 
 		_isInitialized = true;
@@ -81,10 +81,10 @@ namespace AudioLibrary {
 		if (!_isInitialized) return;
 
 		// マスターボイスの破棄
-		_impl->_masteringVoice->DestroyVoice();
+		_masteringVoice.reset();
 
 		// XAudio2の破棄
-		_impl->_xAudio2->Release();
+		_xAudio2.reset();
 
 		// COMの破棄
 		CoUninitialize();
@@ -94,7 +94,7 @@ namespace AudioLibrary {
 
 	unique_ptr<AudioPlayer, AudioPlayerDeleter> Audio::CreateAudioPlayer() {
 		if (!_isInitialized) return nullptr;
-		auto player = unique_ptr<AudioPlayer, AudioPlayerDeleter>(new AudioPlayer(*_impl->_xAudio2));
+		auto player = unique_ptr<AudioPlayer, AudioPlayerDeleter>(new AudioPlayer(*_xAudio2));
 		return player;
 	}
 
@@ -103,7 +103,7 @@ namespace AudioLibrary {
 
 		shared_ptr<AudioData> data;
 		auto hr = S_OK;
-		if (FAILED(hr = AudioLoader::LoadWaveFile(*_impl->_xAudio2, filePath, data))) {
+		if (FAILED(hr = AudioLoader::LoadWaveFile(*_xAudio2, filePath, data))) {
 			return nullptr;
 		}
 		

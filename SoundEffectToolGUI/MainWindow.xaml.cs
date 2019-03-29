@@ -76,7 +76,7 @@ namespace SoundEffectToolGUI {
 		}
 
 		private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
-			//SoundEffectToolHelper.Final();
+			
 		}
 
 		private void UpdateRendering(object sender, EventArgs e) {

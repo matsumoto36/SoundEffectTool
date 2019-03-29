@@ -1,7 +1,8 @@
 #pragma once
 
-#include <Windows.h>
 
-#ifndef SOUNDEFFECTTOOL_API
-#define SOUNDEFFECTTOOL_API __declspec(dllexport)
-#endif
+// AudioLibrary
+namespace AudioLibrary {
+	class AudioPlayer;
+	struct AudioPlayerDeleter;
+}

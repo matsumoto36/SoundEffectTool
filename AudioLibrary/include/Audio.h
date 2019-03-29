@@ -3,12 +3,22 @@
 #include <memory>
 #include <string>
 
+#include "AudioDefine.h"
 #include "AudioLoader.h"
 #include "AudioPlayer.h"
 
+using namespace std;
+
 namespace AudioLibrary {
 
-	using namespace std;
+	// デリーター
+	struct XAudio2Deleter {
+		void operator()(IXAudio2* xaudio2) const;
+	};
+
+	struct MasteringVoiceDeleter {
+		void operator()(IXAudio2MasteringVoice* masteringVoice) const;
+	};
 
 	// サウンドシステムを管理するクラス
 	class AUDIOLIBRARY_API Audio final sealed {
@@ -16,11 +26,11 @@ namespace AudioLibrary {
 		static Audio& _instance;					// singleton
 		static bool _isInitialized;					// 初期化が完了しているか
 
-		class Impl;
-		unique_ptr<Impl> _impl;
+		unique_ptr<IXAudio2, XAudio2Deleter> _xAudio2;								// XAudio2のシステム
+		unique_ptr<IXAudio2MasteringVoice, MasteringVoiceDeleter> _masteringVoice;	// マスターボイス
 
 		Audio();
-		~Audio() { Finalize(); }
+		~Audio();
 
 	public:
 

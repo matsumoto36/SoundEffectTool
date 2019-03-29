@@ -5,6 +5,7 @@
 
 #include "AudioDefine.h"
 #include "AudioData.h"
+#include "../src/WAVFileReader.h"
 
 namespace AudioLibrary {
 

@@ -1,11 +1,10 @@
 #include "stdafx.h"
-#include "Renderer.h"
+#include "../include/SoundEffectTool.h"
 #include "DxLib.h"
 
+using namespace DxLib;
 
 namespace SoundEffectTool {
-
-	using namespace DxLib;
 
 	Renderer::Renderer() = default;
 	Renderer::~Renderer() = default;

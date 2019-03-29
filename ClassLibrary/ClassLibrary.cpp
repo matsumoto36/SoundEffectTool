@@ -1,7 +1,10 @@
 #include "stdafx.h"
 
 #include <Windows.h>
+
+#define SOUNDEFFECTTOOL_API __declspec(dllimport)
 #include "SoundEffectTool.h"
+
 #include "ClassLibrary.h"
 #include "Extensions.h"
 

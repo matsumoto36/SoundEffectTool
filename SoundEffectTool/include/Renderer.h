@@ -1,10 +1,16 @@
 #pragma once
 
 #include "SoundEffectToolDefine.h"
+#include <Windows.h>
 
 namespace SoundEffectTool {
 
 	class SOUNDEFFECTTOOL_API Renderer {
+
+		bool _isInitialized = false;
+		int _maxWidth, _maxHeight;		// 出力される画面の最大サイズ
+		int _width, _height;
+
 	public:
 		Renderer();
 		~Renderer();

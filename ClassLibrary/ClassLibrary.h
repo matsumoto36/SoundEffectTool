@@ -5,12 +5,12 @@ using System::ComponentModel::PropertyChangedEventArgs;
 using System::ComponentModel::PropertyChangedEventHandler;
 using namespace System;
 
-namespace SoundEffectTool {
 
+namespace SoundEffectTool {
 
 	public ref class SoundEffectToolVM : public INotifyPropertyChanged {
 
-		SoundEffectToolManager* _manager;
+		class SoundEffectToolManager* _manager;
 
 	public :
 

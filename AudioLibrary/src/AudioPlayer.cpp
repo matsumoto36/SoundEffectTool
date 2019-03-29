@@ -1,13 +1,14 @@
 #include "stdafx.h"
-#include "AudioPlayer.h"
+#include "../include/AudioPlayer.h"
+
+#include "../include/AudioLoader.h"
 
 namespace AudioLibrary {
 
 	AudioPlayer::AudioPlayer(IXAudio2& xAudio2) :
 		_xAudio2(xAudio2),
 		_sourceVoice(nullptr),
-		_audioData(nullptr) {
-	}
+		_audioData(nullptr) {}
 
 	AudioPlayer::~AudioPlayer() { }
 
@@ -22,8 +23,11 @@ namespace AudioLibrary {
 		// ソースボイスの作成
 		auto hr = S_OK;
 		IXAudio2SourceVoice* sourceVoice;
-		
-		if (FAILED(hr = _xAudio2.CreateSourceVoice(&sourceVoice, &_audioData->GetFormat()))) {
+
+		auto a = &audioData->GetFormat();
+		const tWAVEFORMATEX* b = new tWAVEFORMATEX(audioData->GetFormat());
+		WAVEFORMATEX c = audioData->GetFormat();
+		if (FAILED(hr = _xAudio2.CreateSourceVoice(&sourceVoice, &audioData->GetFormat()))) {
 			wprintf(L"Error %#X creating source voice\n", hr);
 			return hr;
 		}
@@ -40,7 +44,7 @@ namespace AudioLibrary {
 		_sourceVoice->DestroyVoice();
 
 		//音声データを参照しない
-		if(_audioData) _audioData.reset();
+		_audioData = nullptr;
 	}
 
 	bool AudioPlayer::IsPlay() {

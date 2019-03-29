@@ -3,29 +3,37 @@
 
 #include "stdafx.h"
 
-#include "SoundEffectTool.h"
+#include "../include/SoundEffectTool.h"
+#include "AudioPlayer.h"
+#include "AudioData.h"
 
 namespace SoundEffectTool {
 
-	SoundEffectToolManager::SoundEffectToolManager() {
+	struct SoundEffectToolManager::Impl {
+		unique_ptr<AudioPlayer, AudioPlayerDeleter> _audioPlayer;
+		shared_ptr<AudioData> _audioData;
+	};
+
+
+	SoundEffectToolManager::SoundEffectToolManager() :
+		_impl(make_unique<Impl>()) {
 		
 		// サウンドシステムの初期化
-		//auto&& audio = Audio::GetInstance();
-		//audio.Initialize();
+		auto&& audio = Audio::GetInstance();
+		audio.Initialize();
 
 		// プレーヤーを作る
-		//auto player = audio.CreateAudioPlayer();
-		//_audioPlayer = move(player);
+		auto player = audio.CreateAudioPlayer();
+		_impl->_audioPlayer = move(player);
 	}
 
 	SoundEffectToolManager::~SoundEffectToolManager() {
 	
 		// プレイヤーの破棄
-		//_audioPlayer.reset();
+		_impl->_audioPlayer.reset();
 
 		// サウンドシステムの破棄
-		//Audio::GetInstance().Finalize();
-
+		Audio::GetInstance().Finalize();
 	}
 
 	void SoundEffectToolManager::CreateDxView(HWND windowHandle, string& rendererName, int width, int height) {
@@ -45,9 +53,9 @@ namespace SoundEffectTool {
 		if (!audioData) return;
 		
 		// データをセット
-		//_audioPlayer->SetAudioData(audioData);
+		_impl->_audioPlayer->SetAudioData(audioData);
 		// 再生
-		//_audioPlayer->Play();
+		_impl->_audioPlayer->Play();
 	}
 
 }
