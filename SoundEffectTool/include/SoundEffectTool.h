@@ -36,8 +36,14 @@ namespace SoundEffectTool {
 
 		const Renderer& GetRenderer(string& rendererName);
 
-		// 音声を再生
-		void PlaySoundFromFile(const wstring& filePath) const;
+		// 音声をロードする
+		bool LoadSound(const wstring& filePath, const string& name) const;
+
+		// 音声をロードする
+		bool UnLoadSound(const string& name) const;
+
+		// 音声を再生する
+		bool PlaySound(const string& name) const;
 
 	private:
 

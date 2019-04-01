@@ -14,14 +14,16 @@ namespace {
 namespace AudioLibrary {
 
 	struct AudioPlayer::Impl {
-		IXAudio2& _xAudio2;					// XAudio2
-		IXAudio2SourceVoice* _sourceVoice;	// ソースボイス
-		shared_ptr<AudioData> _audioData;	// 再生する音声データ
-		XAUDIO2_VOICE_STATE state;			// 再生中のシステムの情報
+		IXAudio2& _xAudio2;								// XAudio2
+		IXAudio2SourceVoice* _sourceVoice;				// ソースボイス
+		unique_ptr<IXAudio2VoiceCallback> _callBack;	// ソースボイスのコールバック
+		XAUDIO2_VOICE_STATE state;						// 再生中のシステムの情報
+		shared_ptr<AudioData> _audioData;				// 再生する音声データ
 
 		Impl(IXAudio2& xAudio2) :
 			_xAudio2(xAudio2),
 			_sourceVoice(nullptr),
+			_callBack(nullptr),
 			_audioData(nullptr) {}
 	};
 
@@ -68,17 +70,11 @@ namespace AudioLibrary {
 
 		// ソースボイスの作成
 		auto hr = S_OK;
-		IXAudio2SourceVoice* sourceVoice;
-
-		auto a = &audioData->GetFormat();
-		const tWAVEFORMATEX* b = new tWAVEFORMATEX(audioData->GetFormat());
-		WAVEFORMATEX c = audioData->GetFormat();
-		if (FAILED(hr = _impl->_xAudio2.CreateSourceVoice(&sourceVoice, &audioData->GetFormat()))) {
+		if (FAILED(hr = _impl->_xAudio2.CreateSourceVoice(&_impl->_sourceVoice, &audioData->GetFormat()))) {
 			wprintf(L"Error %#X creating source voice\n", hr);
 			return hr;
 		}
 
-		_impl->_sourceVoice = sourceVoice;
 		return hr;
 	}
 
@@ -93,13 +89,17 @@ namespace AudioLibrary {
 		_impl->_audioData = nullptr;
 	}
 
-	HRESULT AudioPlayer::Play() const {
+	HRESULT AudioPlayer::Play() {
 		
 		if (_impl->_sourceVoice == nullptr) return E_FAIL;
 		if (_impl->_audioData == nullptr) {
 			wprintf(L"Not set AudioData.\n");
 			return E_FAIL;
 		}
+
+		Update();
+
+		if (_isPlay) return E_FAIL;
 
 		// バッファの設定
 		auto hr = S_OK;
@@ -118,36 +118,55 @@ namespace AudioLibrary {
 			return hr;
 		}
 
+		_isPlay = true;
+
 		return hr;
 	}
 
-	// 音を止める
-	HRESULT AudioPlayer::Stop() const {
+	HRESULT AudioPlayer::Stop() {
 
+		if (_impl->_sourceVoice == nullptr) return E_FAIL;
 		if (_impl->_audioData == nullptr) {
 			wprintf(L"Not set AudioData.\n");
 			return E_FAIL;
 		}
 
+		Update();
+
+		if (!_isPlay) return E_FAIL;
+
 		// 止める
 		auto hr = S_OK;
 		if (FAILED(hr = _impl->_sourceVoice->Stop())) {
-			wprintf(L"Error %#X failed play audio\n", hr);
+			wprintf(L"Error %#X failed stop audio\n", hr);
 			return hr;
 		}
+
+		_isPlay = false;
 
 		return hr;
 	}
 
-	// 音をポーズする
-	HRESULT AudioPlayer::Pause() const {
+	HRESULT AudioPlayer::Pause() {
 
-		// ポーズ
+		if (_impl->_sourceVoice == nullptr) return E_FAIL;
+		if (_impl->_audioData == nullptr) {
+			wprintf(L"Not set AudioData.\n");
+			return E_FAIL;
+		}
+
+		Update();
+
+		if (!_isPlay) return E_FAIL;
+
+		// 止める
 		auto hr = S_OK;
-		//if (FAILED(hr = _sourceVoice->Stop())) {
-		//	wprintf(L"Error %#X failed play audio\n", hr);
-		//	return;
-		//}
+		if (FAILED(hr = _impl->_sourceVoice->Stop())) {
+			wprintf(L"Error %#X failed stop audio\n", hr);
+			return hr;
+		}
+
+		_isPlay = false;
 
 		return hr;
 	}

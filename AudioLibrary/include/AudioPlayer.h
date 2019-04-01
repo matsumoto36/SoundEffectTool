@@ -49,13 +49,13 @@ namespace AudioLibrary {
 		void UnSetAudioData();
 
 		// 音を再生する
-		HRESULT Play() const;
+		HRESULT Play();
 
 		// 音を止める
-		HRESULT Stop() const;
+		HRESULT Stop();
 
-		// 音をポーズする
-		HRESULT Pause() const;
+		// 音をポーズする(現状ストップと同じ)
+		HRESULT Pause();
 	};
 
 	// プレイヤーのデリーター

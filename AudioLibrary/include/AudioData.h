@@ -3,6 +3,7 @@
 // unique_ptr使用につき
 #pragma warning(disable:4251)
 
+#include <vector>
 #include <memory>
 #include "AudioDefine.h"
 
@@ -15,7 +16,7 @@ namespace AudioLibrary {
 	// 読み込んだサウンドのデータ
 	class AUDIOLIBRARY_API AudioData {
 
-		unique_ptr<uint8_t[]> _wave;					// 波形本体
+		unique_ptr<uint8_t[]> _wave;	// 波形本体
 
 		struct Impl;
 		unique_ptr<Impl> _impl;
@@ -29,13 +30,15 @@ namespace AudioLibrary {
 		AudioData(AudioData&&) noexcept;
 		AudioData& operator=(const AudioData&) = delete;
 
+
+
+		// 波形を返す
+		const unique_ptr<uint8_t[]>& GetWave() const;
+
 		// フォーマットを返す
 		const WAVEFORMATEX& GetFormat() const;
-	
+
 		// バッファを返す
 		const XAUDIO2_BUFFER& GetBuffer() const;
-
-		// 指定したチャンネルの波形を取得する
-		//const unique_ptr<uint8_t[]>& GetWave(int channel) const;
 	};
 }

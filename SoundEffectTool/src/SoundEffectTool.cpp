@@ -10,8 +10,8 @@
 namespace SoundEffectTool {
 
 	struct SoundEffectToolManager::Impl {
-		unique_ptr<AudioPlayer, AudioPlayerDeleter> _audioPlayer;
-		shared_ptr<AudioData> _audioData;
+		map<string, unique_ptr<AudioPlayer, AudioPlayerDeleter>> _audioPlayerList;
+		map<string, shared_ptr<AudioData>> _audioDataList;
 	};
 
 
@@ -24,13 +24,15 @@ namespace SoundEffectTool {
 
 		// プレーヤーを作る
 		auto player = audio.CreateAudioPlayer();
-		_impl->_audioPlayer = move(player);
+		_impl->_audioDataList.emplace("Main", move(player));
 	}
 
 	SoundEffectToolManager::~SoundEffectToolManager() {
 	
 		// プレイヤーの破棄
-		_impl->_audioPlayer.reset();
+		for (auto&& player : _impl->_audioPlayerList) {
+			player.second.reset();
+		}
 
 		// サウンドシステムの破棄
 		Audio::GetInstance().Finalize();
@@ -46,16 +48,37 @@ namespace SoundEffectTool {
 		return *_rendererList[rendererName];
 	}
 
-	void SoundEffectToolManager::PlaySoundFromFile(const wstring& filePath) const {
+	bool SoundEffectToolManager::LoadSound(const wstring& filePath, const string& name) const {
+		
+		// 同じキーで登録できないようにする
+		if (_impl->_audioDataList.count(name) > 0) {
+			printf("already loaded sound data. key=%s", name);
+		};
+		
 		// ファイル読み込み
 		auto audioData = move(Audio::GetInstance().LoadAudioData(filePath));
 
-		if (!audioData) return;
+		if (!audioData) {
+			wprintf(L"failed load sound data. path=%s", filePath);
+		}
 		
+		// 追加
+		_impl->_audioDataList.emplace(name, move(audioData));
+	}
+
+	bool SoundEffectToolManager::PlaySound(const string& name) const {
+
+		if (_impl->_audioDataList.count(name) <= 0) {
+			printf("Sound data is not found. key=%s", name);
+			return false;
+		}
+
+		auto data = _impl->_audioDataList[name];
+		auto&& target = _impl->_audioPlayerList["Main"];
 		// データをセット
-		_impl->_audioPlayer->SetAudioData(audioData);
+		target->SetAudioData(data);
 		// 再生
-		_impl->_audioPlayer->Play();
+		target->Play();
 	}
 
 }
