@@ -7,11 +7,13 @@
     <ClInclude Include="include\Renderer.h" />
     <ClInclude Include="include\SoundEffectTool.h" />
     <ClInclude Include="include\SoundEffectToolDefine.h" />
+    <ClInclude Include="include\AudioController.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\Renderer.cpp" />
     <ClCompile Include="src\SoundEffectTool.cpp" />
     <ClCompile Include="src\stdafx.cpp" />
+    <ClCompile Include="src\AudioController.cpp" />
   </ItemGroup>
 </Project>

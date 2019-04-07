@@ -30,8 +30,6 @@ namespace AudioLibrary {
 	}
 
 	void Audio::Initialize() {
-		_RPT0(_CRT_WARN, "Audio::Initialize\n");
-		wprintf(L"Audio::Initialize\n");
 
 		if (_isInitialized) {
 			wprintf(L"XAudio2 is already initialized. \n");

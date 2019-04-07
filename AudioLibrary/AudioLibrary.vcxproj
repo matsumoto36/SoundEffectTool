@@ -153,12 +153,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="include\IAudioData.h" />
     <ClInclude Include="include\Audio.h" />
     <ClInclude Include="include\AudioData.h" />
     <ClInclude Include="include\AudioDefine.h" />
     <ClInclude Include="include\AudioLoader.h" />
     <ClInclude Include="include\AudioPlayer.h" />
+    <ClInclude Include="include\AudioPlayerStatus.h" />
     <ClInclude Include="src\stdafx.h" />
     <ClInclude Include="src\targetver.h" />
     <ClInclude Include="src\WAVFileReader.h" />

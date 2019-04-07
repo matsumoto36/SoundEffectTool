@@ -2,8 +2,10 @@
 
 #include <math.h>
 #include <memory>
+#include <functional>
 
 #include "AudioDefine.h"
+#include "AudioPlayerStatus.h"
 #include "AudioData.h"
 
 namespace AudioLibrary {
@@ -11,10 +13,15 @@ namespace AudioLibrary {
 	// 音声データを再生するクラス
 	class AUDIOLIBRARY_API AudioPlayer {
 
+	public:
+		function<void(bool)> OnIsPlayChanged;	// 再生状態が変化したときに呼ばれる
+		function<void(float)> OnVolumeChanged;	// 音量が変化したときに呼ばれる
+
 	private:
-			
-		bool _isPlay;		// 再生しているか
-		float _volume;		// 現在の音量
+		AudioPlayerStatus _status;	// 再生状態
+		float _volume;				// 現在の音量
+
+		class VoiceCallback;		// XAudio2のコールバック
 
 		struct Impl;
 		unique_ptr<Impl> _impl;
@@ -25,12 +32,11 @@ namespace AudioLibrary {
 
 		// コピーは禁止するが、ムーブは許可する
 		AudioPlayer(const AudioPlayer&) = delete;
-		AudioPlayer(AudioPlayer&&) noexcept;
 		AudioPlayer& operator=(const AudioPlayer&) = delete;
 
 		// 現在音声を再生しているか
 		bool IsPlay() const {
-			return _isPlay;
+			return _status == AudioPlayerStatus::Play;
 		}
 
 		float GetVolume() const {
@@ -54,8 +60,17 @@ namespace AudioLibrary {
 		// 音を止める
 		HRESULT Stop();
 
-		// 音をポーズする(現状ストップと同じ)
+		// 音をポーズする
 		HRESULT Pause();
+
+	private:
+
+		// 再生の状態を設定する
+		void SetPlayerStatus(AudioPlayerStatus status);
+
+		// データが整っているか調べる
+		HRESULT CheckValidData() const;
+
 	};
 
 	// プレイヤーのデリーター

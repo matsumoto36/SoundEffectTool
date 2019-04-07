@@ -1,21 +1,28 @@
 ﻿#pragma once
 
-using System::ComponentModel::INotifyPropertyChanged;
-using System::ComponentModel::PropertyChangedEventArgs;
-using System::ComponentModel::PropertyChangedEventHandler;
 using namespace System;
-
 
 namespace SoundEffectTool {
 
-	public ref class SoundEffectToolVM : public INotifyPropertyChanged {
+	public ref class SoundEffectToolVM {
 
+	internal:
 		class SoundEffectToolManager* _manager;
+		AudioController& _audioController;
 
-	public :
+		// コールバックバインド用
+		void CallOnAudioIsPlayChanged(bool isPlay) { OnAudioIsPlayChanged(isPlay); }
+		void CallOnAudioVolumeChanged(float volume) { OnAudioVolumeChanged(volume); }
 
-		// INotifyPropertyChanged を介して継承されました
-		virtual event System::ComponentModel::PropertyChangedEventHandler ^PropertyChanged;
+	private:
+
+	public:
+
+		// 再生の状態が変化した場合に呼ばれる
+		event Action<bool>^ OnAudioIsPlayChanged;
+
+		// 音量が変化した場合に呼ばれる
+		event Action<float>^ OnAudioVolumeChanged;
 
 		SoundEffectToolVM();
 		~SoundEffectToolVM();
@@ -33,8 +40,35 @@ namespace SoundEffectTool {
 		// 描画する
 		void Draw(String^ windowName);
 
-		// 音声を再生
-		void PlaySoundFromFile(String^ windowName);
+		// 音声の情報を更新する
+		void UpdateAudio();
+
+		// 音声をロードする
+		bool LoadSound(String^ filePath, String^ name);
+
+		// 音声を解放する
+		bool UnLoadSound(String^ name);
+
+		// 音声を再生可能状態にする
+		bool SetMainSound(String^ name);
+
+		// 再生しているかを取得する
+		bool IsPlay();
+
+		// 音量を取得する
+		float GetVolume();
+
+		// 音量を設定する
+		void SetVolume(float volume);
+
+		// 音声を再生する
+		bool PlayMainSound();
+
+		// 音声を停止する
+		bool StopMainSound();
+
+		// 音声を一時停止する
+		bool PauseMainSound();
 
 	};
 }

@@ -9,18 +9,16 @@
 
 #include "SoundEffectToolDefine.h"
 #include "Renderer.h"
+#include "AudioController.h"
 
 using namespace std;
-using namespace AudioLibrary;
 
 namespace SoundEffectTool {
 
 	class SOUNDEFFECTTOOL_API SoundEffectToolManager final sealed {
 
 		map<string, unique_ptr<Renderer>> _rendererList;
-
-		class Impl;
-		unique_ptr<Impl> _impl;
+		unique_ptr<AudioController> _audioController;
 
 	public:
 
@@ -36,14 +34,7 @@ namespace SoundEffectTool {
 
 		const Renderer& GetRenderer(string& rendererName);
 
-		// 音声をロードする
-		bool LoadSound(const wstring& filePath, const string& name) const;
-
-		// 音声をロードする
-		bool UnLoadSound(const string& name) const;
-
-		// 音声を再生する
-		bool PlaySound(const string& name) const;
+		AudioController& GetAudioController() const;
 
 	private:
 

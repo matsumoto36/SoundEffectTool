@@ -36,10 +36,10 @@
     <ClInclude Include="include\AudioPlayer.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="include\IAudioData.h">
+    <ClInclude Include="include\AudioDefine.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="include\AudioDefine.h">
+    <ClInclude Include="include\AudioPlayerStatus.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

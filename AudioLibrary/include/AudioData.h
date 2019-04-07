@@ -30,8 +30,6 @@ namespace AudioLibrary {
 		AudioData(AudioData&&) noexcept;
 		AudioData& operator=(const AudioData&) = delete;
 
-
-
 		// ”gŒ`‚ð•Ô‚·
 		const unique_ptr<uint8_t[]>& GetWave() const;
 

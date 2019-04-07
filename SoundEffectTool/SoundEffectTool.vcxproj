@@ -167,6 +167,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="include\AudioController.h" />
     <ClInclude Include="include\Renderer.h" />
     <ClInclude Include="src\resource.h" />
     <ClInclude Include="include\SoundEffectTool.h" />
@@ -175,6 +176,7 @@
     <ClInclude Include="src\targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\AudioController.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\Renderer.cpp" />
     <ClCompile Include="src\SoundEffectTool.cpp" />
