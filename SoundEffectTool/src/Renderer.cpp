@@ -17,7 +17,7 @@ namespace SoundEffectTool {
 		ChangeWindowMode(TRUE);								// ウィンドウモードに設定
 		SetWindowSizeChangeEnableFlag(TRUE);				// ウィンドウサイズを可変に
 
-		GetDefaultState(&_maxWidth, &_maxHeight, NULL);	// デスクトップのウィンドウサイズを取得
+		GetDefaultState(&_maxWidth, &_maxHeight, NULL);		// デスクトップのウィンドウサイズを取得
 		SetGraphMode(_maxWidth, _maxHeight, 32);			// グラフィックモードの設定(最大)
 
 		SetAlwaysRunFlag(TRUE);								// 非アクティブ時も処理続行

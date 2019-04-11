@@ -7,8 +7,6 @@
 
 namespace SoundEffectTool {
 
-
-
 	SoundEffectToolManager::SoundEffectToolManager() :
 		_audioController(make_unique<AudioController>()) { }
 
