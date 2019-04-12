@@ -30,8 +30,14 @@ namespace AudioLibrary {
 		AudioData(AudioData&&) noexcept;
 		AudioData& operator=(const AudioData&) = delete;
 
+		// 指定した数のデータを取得
+		const bool ReadData(size_t start, size_t count, const uint8_t* bytes) const;
+
 		// 波形を返す
 		const unique_ptr<uint8_t[]>& GetWave() const;
+
+		// チャンネルの数を返す
+		const int GetChannelCount() const;
 
 		// フォーマットを返す
 		const WAVEFORMATEX& GetFormat() const;

@@ -179,7 +179,7 @@ namespace AudioLibrary {
 				}
 				break;
 			case AudioPlayerStatus::Pause:
-				/* ポーズからの復帰はバッファは既に存在 */
+				/* ポーズからの復帰はバッファは既に存在している */
 				break;
 			default:
 				break;
@@ -197,6 +197,20 @@ namespace AudioLibrary {
 		SetPlayerStatus(AudioPlayerStatus::Play);
 
 		return hr;
+	}
+
+	HRESULT AudioPlayer::PlayAtPosition(size_t samples) {
+
+		Stop();
+
+		// 指定した位置からのバッファを補給する
+		auto buffer = _impl->_audioData->GetBuffer();
+		buffer.PlayBegin = samples;
+		auto hr = _impl->_sourceVoice->SubmitSourceBuffer(&buffer);
+		if (FAILED(hr)) {
+			wprintf(L"Error %#X submitting source buffer\n", hr);
+			return hr;
+		}
 	}
 
 	HRESULT AudioPlayer::Stop() {

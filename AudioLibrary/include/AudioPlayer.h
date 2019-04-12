@@ -54,8 +54,14 @@ namespace AudioLibrary {
 		// プレイヤーから音声データを削除する
 		void UnSetAudioData();
 
+		// 再生位置を取得(秒)
+		float GetPlayerPosition();
+		
 		// 音を再生する
 		HRESULT Play();
+
+		// 音を位置指定して再生する
+		HRESULT PlayAtPosition(size_t samples);
 
 		// 音を止める
 		HRESULT Stop();

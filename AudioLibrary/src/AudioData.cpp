@@ -28,6 +28,10 @@ namespace AudioLibrary {
 		return _wave;
 	}
 
+	const int AudioData::GetChannelCount() const {
+		return _impl->_format.nChannels;
+	}
+
 	const WAVEFORMATEX& AudioData::GetFormat() const {
 		return _impl->_format;
 	}

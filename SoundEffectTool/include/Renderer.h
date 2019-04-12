@@ -25,7 +25,7 @@ namespace SoundEffectTool {
 		void ChangeDrawSize(int width, int height);
 
 		// •`‰æ‚ğXV‚·‚é
-		void Draw() const;
+		void DrawWave() const;
 
 	};
 }

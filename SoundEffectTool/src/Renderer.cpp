@@ -56,7 +56,7 @@ namespace SoundEffectTool {
 		_height = height;
 	}
 
-	void Renderer::Draw() const {
+	void Renderer::DrawWave() const {
 
 		//‰æ–Ê‚ğÁ‚·
 		ClearDrawScreen();
