@@ -203,7 +203,7 @@ namespace AudioLibrary {
 
 		Stop();
 
-		// 指定した位置からのバッファを補給する
+		// 指定した位置からのバッファを指定
 		auto buffer = _impl->_audioData->GetBuffer();
 		buffer.PlayBegin = samples;
 		auto hr = _impl->_sourceVoice->SubmitSourceBuffer(&buffer);
@@ -211,6 +211,8 @@ namespace AudioLibrary {
 			wprintf(L"Error %#X submitting source buffer\n", hr);
 			return hr;
 		}
+
+		return hr;
 	}
 
 	HRESULT AudioPlayer::Stop() {

@@ -65,7 +65,7 @@ namespace SoundEffectTool {
 
 	void SoundEffectToolVM::Draw(String^ windowName) {
 		auto renderer = _manager->GetRenderer(ToStdString(windowName));
-		renderer.Draw();
+		renderer.DrawWave();
 	}
 
 	void SoundEffectToolVM::UpdateAudio() {
