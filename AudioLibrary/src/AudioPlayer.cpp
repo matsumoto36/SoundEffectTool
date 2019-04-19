@@ -37,7 +37,6 @@ namespace AudioLibrary {
 		IXAudio2& _xAudio2;								// XAudio2
 		IXAudio2SourceVoice* _sourceVoice;				// ソースボイス
 		unique_ptr<IXAudio2VoiceCallback> _callback;	// ソースボイスのコールバック
-		XAUDIO2_VOICE_STATE state;						// 再生中のシステムの情報
 		shared_ptr<AudioData> _audioData;				// 再生する音声データ
 
 		// XAudio2のコールバックをラップする
@@ -120,10 +119,8 @@ namespace AudioLibrary {
 		if (OnVolumeChanged) OnVolumeChanged(_volume);
 	}
 
-	void AudioPlayer::Update() {
-		if (_impl->_sourceVoice == nullptr) return;
-
-		/* コールバックで処理をしているため、現在は意味がない */
+	const shared_ptr<AudioData>& AudioPlayer::GetAudioData() const {
+		return _impl->_audioData;
 	}
 
 	HRESULT AudioPlayer::SetAudioData(const shared_ptr<AudioData>& audioData) {
@@ -158,6 +155,17 @@ namespace AudioLibrary {
 
 		//音声データを参照しない
 		_impl->_audioData = nullptr;
+	}
+
+	void AudioPlayer::Update() {
+		if (_impl->_sourceVoice == nullptr) return;
+
+		XAUDIO2_VOICE_STATE state;
+		_impl->_sourceVoice->GetState(&state);
+
+		// 再生位置取得
+		_position = state.SamplesPlayed;
+
 	}
 
 	HRESULT AudioPlayer::Play() {
@@ -199,7 +207,7 @@ namespace AudioLibrary {
 		return hr;
 	}
 
-	HRESULT AudioPlayer::PlayAtPosition(size_t samples) {
+	HRESULT AudioPlayer::PlayAtPosition(UINT32 samples) {
 
 		Stop();
 

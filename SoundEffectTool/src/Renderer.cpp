@@ -50,6 +50,10 @@ namespace SoundEffectTool {
 		return GetUseDirect3D9BackBufferSurface();
 	}
 
+	void Renderer::SetWaveData(const unique_ptr<uint8_t[]>& waveData, UINT32 length, int channels) {
+		// todo
+	}
+
 	void Renderer::ChangeDrawSize(int width, int height) {
 		SetWindowSize(width, height);
 		_width = width;

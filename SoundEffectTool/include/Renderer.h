@@ -11,6 +11,8 @@ namespace SoundEffectTool {
 		int _maxWidth, _maxHeight;		// 出力される画面の最大サイズ
 		int _width, _height;
 
+		vector<unique_ptr<uint8_t[]>> _wavePerChannel;
+
 	public:
 		Renderer();
 		~Renderer();
@@ -20,6 +22,9 @@ namespace SoundEffectTool {
 
 		// バックバッファを取得する
 		const void* GetBackBuffer() const;
+
+		// 波形の情報をセットする
+		void SetWaveData(const unique_ptr<uint8_t[]>& waveData, UINT32 length, int channels);
 
 		// 描画のサイズを変更する
 		void ChangeDrawSize(int width, int height);

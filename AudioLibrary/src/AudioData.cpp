@@ -18,7 +18,8 @@ namespace AudioLibrary {
 
 	AudioData::AudioData(const WAVEFORMATEX& format, unique_ptr<uint8_t[]> wave, const XAUDIO2_BUFFER& buffer) :
 		_impl(make_unique<Impl>(format, buffer)),
-		_wave(move(wave)) { }
+		_wave(move(wave)),
+		_length(buffer.AudioBytes / format.wBitsPerSample) { }
 
 	AudioData::~AudioData() {
 		_wave.reset();
@@ -39,6 +40,4 @@ namespace AudioLibrary {
 	const XAUDIO2_BUFFER& AudioData::GetBuffer() const {
 		return _impl->_buffer;
 	}
-
-
 }

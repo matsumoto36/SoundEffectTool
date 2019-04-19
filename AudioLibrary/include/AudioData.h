@@ -17,6 +17,7 @@ namespace AudioLibrary {
 	class AUDIOLIBRARY_API AudioData {
 
 		unique_ptr<uint8_t[]> _wave;	// 波形本体
+		UINT32 _length;					// 波形の長さ(サンプル数)
 
 		struct Impl;
 		unique_ptr<Impl> _impl;
@@ -30,11 +31,13 @@ namespace AudioLibrary {
 		AudioData(AudioData&&) noexcept;
 		AudioData& operator=(const AudioData&) = delete;
 
-		// 指定した数のデータを取得
-		const bool ReadData(size_t start, size_t count, const uint8_t* bytes) const;
-
 		// 波形を返す
 		const unique_ptr<uint8_t[]>& GetWave() const;
+
+		// 波形の長さを返す(サンプル数)
+		const UINT32 GetLength() const {
+			return _length;
+		}
 
 		// チャンネルの数を返す
 		const int GetChannelCount() const;

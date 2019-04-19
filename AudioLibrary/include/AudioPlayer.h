@@ -14,12 +14,13 @@ namespace AudioLibrary {
 	class AUDIOLIBRARY_API AudioPlayer {
 
 	public:
-		function<void(bool)> OnIsPlayChanged;	// 再生状態が変化したときに呼ばれる
-		function<void(float)> OnVolumeChanged;	// 音量が変化したときに呼ばれる
+		function<void(bool)> OnIsPlayChanged;			// 再生状態が変化したときに呼ばれる
+		function<void(float)> OnVolumeChanged;			// 音量が変化したときに呼ばれる
 
 	private:
 		AudioPlayerStatus _status;	// 再生状態
 		float _volume;				// 現在の音量
+		UINT32 _position;			// 再生位置	
 
 		class VoiceCallback;		// XAudio2のコールバック
 
@@ -45,8 +46,12 @@ namespace AudioLibrary {
 
 		void SetVolume(float volume);
 
-		// 再生システムの情報を更新する
-		void Update();
+		// 再生位置を取得
+		UINT32 GetPosition() const {
+			return _position;
+		}
+
+		const shared_ptr<AudioData>& GetAudioData() const;
 
 		// プレイヤーに音声データを入力する
 		HRESULT SetAudioData(const shared_ptr<AudioData>& audioData);
@@ -54,14 +59,14 @@ namespace AudioLibrary {
 		// プレイヤーから音声データを削除する
 		void UnSetAudioData();
 
-		// 再生位置を取得(秒)
-		float GetPlayerPosition();
-		
+		// 再生システムの情報を更新する
+		void Update();
+
 		// 音を再生する
 		HRESULT Play();
 
 		// 音を位置指定して再生する
-		HRESULT PlayAtPosition(size_t samples);
+		HRESULT PlayAtPosition(UINT32 samples);
 
 		// 音を止める
 		HRESULT Stop();
