@@ -38,6 +38,9 @@ namespace AudioLibrary {
 		IXAudio2SourceVoice* _sourceVoice;				// ソースボイス
 		unique_ptr<IXAudio2VoiceCallback> _callback;	// ソースボイスのコールバック
 		shared_ptr<AudioData> _audioData;				// 再生する音声データ
+		
+		const float FadeTime = 0.05f;					// 内部フェードの時間
+		float _xaudio2Volume;							// 詳細な音量 内部フェードの制御用
 
 		// XAudio2のコールバックをラップする
 		function<void()> OnXAudio2StreamEnd;
@@ -65,9 +68,9 @@ namespace AudioLibrary {
 		if (!Player._impl->OnXAudio2VoiceProcessingPassEnd) return;
 		Player._impl->OnXAudio2VoiceProcessingPassEnd();
 	}
-	void STDMETHODCALLTYPE AudioPlayer::VoiceCallback::OnVoiceProcessingPassStart(UINT32 samplesRequired) {
+	void STDMETHODCALLTYPE AudioPlayer::VoiceCallback::OnVoiceProcessingPassStart(UINT32 bytesRequired) {
 		if (!Player._impl->OnXAudio2VoiceProcessingPassStart) return;
-		Player._impl->OnXAudio2VoiceProcessingPassStart(samplesRequired);
+		Player._impl->OnXAudio2VoiceProcessingPassStart(bytesRequired);
 	}
 	void STDMETHODCALLTYPE AudioPlayer::VoiceCallback::OnBufferEnd(void * pBufferContext) {
 		if (!Player._impl->OnXAudio2BufferEnd) return;
@@ -94,9 +97,22 @@ namespace AudioLibrary {
 		_volume(volume) { 
 	
 		// XAudio2のコールバックの動作を設定
-		_impl->OnXAudio2BufferEnd = [&](void* pBufferContext) {
-			// 今回はバッファの終了=再生の終了
-			SetPlayerStatus(AudioPlayerStatus::Stop);
+		_impl->OnXAudio2VoiceProcessingPassStart = [&](UINT32 requredBytes) {
+
+			//if (FAILED(CheckValidData())) return;
+
+			// *疑似的にストリーミング仕様にするとノイズが発生*
+			if (requredBytes == 0) return;
+			AddBuffer(requredBytes);
+
+		};
+
+		_impl->OnXAudio2BufferEnd = [&](void * pBufferContext) {
+			// 今回はバッファの終了が再生の終了
+			//XAUDIO2_VOICE_STATE state;
+			//_impl->_sourceVoice->GetState(&state);
+			//if(state.BuffersQueued < 3)
+			//	AddBuffer(1764);
 		};
 	}
 
@@ -113,7 +129,7 @@ namespace AudioLibrary {
 		_volume = volume;
 
 		if (_impl->_sourceVoice == nullptr) return;
-		_impl->_sourceVoice->SetVolume(ToDecibelRatio(_volume));
+		SetFade(_volume, _impl->FadeTime);
 
 		// 通知
 		if (OnVolumeChanged) OnVolumeChanged(_volume);
@@ -157,14 +173,18 @@ namespace AudioLibrary {
 		_impl->_audioData = nullptr;
 	}
 
-	void AudioPlayer::Update() {
+	void AudioPlayer::Update(float deltaTime) {
 		if (_impl->_sourceVoice == nullptr) return;
 
-		XAUDIO2_VOICE_STATE state;
-		_impl->_sourceVoice->GetState(&state);
+		// フェード更新
+		UpdateFade(deltaTime);
 
-		// 再生位置取得
-		_position = state.SamplesPlayed;
+		//XAUDIO2_VOICE_STATE state;
+		//_impl->_sourceVoice->GetState(&state);
+
+		// 再生位置の計算
+		auto blockAlign = _impl->_audioData->GetFormat().nBlockAlign;
+		_position = _seekData / blockAlign;
 
 	}
 
@@ -173,18 +193,18 @@ namespace AudioLibrary {
 		auto hr = S_OK;
 		if (FAILED(hr = CheckValidData())) return hr;
 
-		Update();
-
 		switch (_status) {
 			case AudioPlayerStatus::Play:
 				return E_FAIL;
 			case AudioPlayerStatus::Stop:
 				// 停止状態からはバッファの補給が必要
-				auto buffer = _impl->_audioData->GetBuffer();
-				if (FAILED(hr = _impl->_sourceVoice->SubmitSourceBuffer(&buffer))) {
-					wprintf(L"Error %#X submitting source buffer\n", hr);
-					return hr;
-				}
+				//auto buffer = _impl->_audioData->GetBuffer();
+				//if (FAILED(hr = _impl->_sourceVoice->SubmitSourceBuffer(&buffer))) {
+				//	wprintf(L"Error %#X submitting source buffer\n", hr);
+				//	return hr;
+				//}
+				_seekData = 0;
+				//AddBuffer(1764000);
 				break;
 			case AudioPlayerStatus::Pause:
 				/* ポーズからの復帰はバッファは既に存在している */
@@ -194,7 +214,7 @@ namespace AudioLibrary {
 		}
 
 		// 音量の設定
-		_impl->_sourceVoice->SetVolume(ToDecibelRatio(_volume));
+		SetFade(_volume, _impl->FadeTime);
 
 		// 再生
 		if (FAILED(hr = _impl->_sourceVoice->Start(0))) {
@@ -211,12 +231,30 @@ namespace AudioLibrary {
 
 		Stop();
 
+		auto hr = S_OK;
+		if (FAILED(hr = CheckValidData())) return hr;
+
 		// 指定した位置からのバッファを指定
-		auto buffer = _impl->_audioData->GetBuffer();
-		buffer.PlayBegin = samples;
-		auto hr = _impl->_sourceVoice->SubmitSourceBuffer(&buffer);
-		if (FAILED(hr)) {
-			wprintf(L"Error %#X submitting source buffer\n", hr);
+		//auto buffer = _impl->_audioData->GetBuffer();
+		//buffer.PlayBegin = samples;
+		//hr = _impl->_sourceVoice->SubmitSourceBuffer(&buffer);
+		//if (FAILED(hr)) {
+		//	wprintf(L"Error %#X submitting source buffer\n", hr);
+		//	return hr;
+		//}
+
+		_position = samples;
+		auto blockAlign = _impl->_audioData->GetFormat().nBlockAlign;
+		_seekData = _position * blockAlign;
+
+		// 音量の設定
+		SetFade(_volume, _impl->FadeTime);
+
+
+		// 再生
+		//AddBuffer(1764);
+		if (FAILED(hr = _impl->_sourceVoice->Start(0))) {
+			wprintf(L"Error %#X failed play audio\n", hr);
 			return hr;
 		}
 
@@ -228,27 +266,31 @@ namespace AudioLibrary {
 		auto hr = S_OK;
 		if (FAILED(hr = CheckValidData())) return hr;
 
-		Update();
-
 		switch (_status) {
 			case AudioPlayerStatus::Play:
 				break;
 			case AudioPlayerStatus::Stop:
-				return E_FAIL;
+				break;
 			case AudioPlayerStatus::Pause:
 				break;
 			default:
 				break;
 		}
 
-		if (FAILED(hr = _impl->_sourceVoice->Stop())) {
-			wprintf(L"Error %#X failed stop audio\n", hr);
-			return hr;
-		}
+		SetFade(0, _impl->FadeTime, [&]() {
 
-		// 止めて最初から再生したい場合はFlushSourceBuffersを実行する
-		_impl->_sourceVoice->FlushSourceBuffers();
+			if (FAILED(hr = _impl->_sourceVoice->Stop())) {
+				wprintf(L"Error %#X failed stop audio\n", hr);
+			}
+
+			_seekData = 0;
+
+			// 止めて最初から再生したい場合はFlushSourceBuffersを実行する
+			_impl->_sourceVoice->FlushSourceBuffers();
+		
+		});
 		SetPlayerStatus(AudioPlayerStatus::Stop);
+
 
 		return hr;
 	}
@@ -257,8 +299,6 @@ namespace AudioLibrary {
 
 		auto hr = S_OK;
 		if (FAILED(hr = CheckValidData())) return hr;
-
-		Update();
 
 		switch (_status) {
 			case AudioPlayerStatus::Play:
@@ -272,11 +312,14 @@ namespace AudioLibrary {
 		}
 
 		// Stopが一時停止になる
-		if (FAILED(hr = _impl->_sourceVoice->Stop())) {
-			wprintf(L"Error %#X failed stop audio\n", hr);
-			return hr;
-		}
+		SetFade(0, _impl->FadeTime, [&]() {
 
+			if (FAILED(hr = _impl->_sourceVoice->Stop())) {
+				wprintf(L"Error %#X failed stop audio\n", hr);
+				return hr;
+			}
+
+		});
 		SetPlayerStatus(AudioPlayerStatus::Pause);
 
 		return hr;
@@ -303,5 +346,57 @@ namespace AudioLibrary {
 		}
 
 		return S_OK;
+	}
+
+	void AudioPlayer::AddBuffer(UINT32 requredBytes) {
+
+		auto&& p = _impl->_audioData->GetWave();
+		XAUDIO2_BUFFER buf = { 0 };
+		buf.pAudioData = &p[_seekData];
+
+		// リクエストに対して存在しているサンプルを計算
+		auto length = _impl->_audioData->GetBuffer().AudioBytes;
+		if (length >= _seekData + requredBytes) {
+			buf.AudioBytes = requredBytes;
+			_seekData += requredBytes;
+		}
+		else {
+			auto bytes = length - _seekData;
+			if (bytes <= 0) {
+				Stop();
+				return;
+			}
+			buf.AudioBytes = bytes;
+			buf.Flags = XAUDIO2_END_OF_STREAM;
+			_seekData += bytes;
+		}
+
+		_impl->_sourceVoice->SubmitSourceBuffer(&buf);
+	}
+
+	void AudioPlayer::SetFade(float targetVolume, float targetTime, function<void()> callback) {
+		_fadeStartVolume = _impl->_xaudio2Volume;
+		_targetVolume = targetVolume;
+		_targetTime = targetTime;
+		_fadeCallback = callback;
+		_fading = 0;
+	}
+
+	void AudioPlayer::UpdateFade(float deltaTime) {
+		if (_fading >= _targetTime) return;
+		
+		_fading += deltaTime;
+
+		// フェード完了
+		if (_fading >= _targetTime) {
+			_fading = _targetTime;
+			_impl->_sourceVoice->SetVolume(ToDecibelRatio(_impl->_xaudio2Volume = _targetVolume));
+			if (_fadeCallback) _fadeCallback();
+		}
+		else {
+			_impl->_xaudio2Volume = _fadeStartVolume + (_targetVolume - _fadeStartVolume) * (_fading / _targetTime);
+			_impl->_sourceVoice->SetVolume(ToDecibelRatio(_impl->_xaudio2Volume));
+		}
+
 	}
 }

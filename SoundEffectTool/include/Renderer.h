@@ -1,7 +1,15 @@
 #pragma once
 
+// unique_ptr使用につき
+#pragma warning(disable:4251)
+
+#include <vector>
+#include <memory>
+
 #include "SoundEffectToolDefine.h"
-#include <Windows.h>
+
+using namespace AudioLibrary;
+using namespace std;
 
 namespace SoundEffectTool {
 
@@ -14,6 +22,11 @@ namespace SoundEffectTool {
 		vector<unique_ptr<uint8_t[]>> _wavePerChannel;
 
 	public:
+
+		// コピーは禁止するが、ムーブは許可する
+		Renderer(const Renderer&) = delete;
+		Renderer& operator=(const Renderer&) = delete;
+
 		Renderer();
 		~Renderer();
 
@@ -23,8 +36,8 @@ namespace SoundEffectTool {
 		// バックバッファを取得する
 		const void* GetBackBuffer() const;
 
-		// 波形の情報をセットする
-		void SetWaveData(const unique_ptr<uint8_t[]>& waveData, UINT32 length, int channels);
+		// 波形の情報を変換してセットする
+		void SetAndSplitWaveData(const unique_ptr<uint8_t[]>& waveData, UINT32 length, int channels);
 
 		// 描画のサイズを変更する
 		void ChangeDrawSize(int width, int height);

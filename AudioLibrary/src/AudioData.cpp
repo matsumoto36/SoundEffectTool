@@ -19,7 +19,7 @@ namespace AudioLibrary {
 	AudioData::AudioData(const WAVEFORMATEX& format, unique_ptr<uint8_t[]> wave, const XAUDIO2_BUFFER& buffer) :
 		_impl(make_unique<Impl>(format, buffer)),
 		_wave(move(wave)),
-		_length(buffer.AudioBytes / format.wBitsPerSample) { }
+		_length(buffer.AudioBytes / format.nBlockAlign) { }
 
 	AudioData::~AudioData() {
 		_wave.reset();

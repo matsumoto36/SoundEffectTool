@@ -18,11 +18,18 @@ namespace AudioLibrary {
 		function<void(float)> OnVolumeChanged;			// 音量が変化したときに呼ばれる
 
 	private:
-		AudioPlayerStatus _status;	// 再生状態
-		float _volume;				// 現在の音量
-		UINT32 _position;			// 再生位置	
+		AudioPlayerStatus _status;		// 再生状態
+		float _volume;					// 現在の音量
+		UINT64 _position;				// 再生位置(サンプル数)
+		UINT32 _seekData;				// 再生位置(バイト数)
 
-		class VoiceCallback;		// XAudio2のコールバック
+		float _targetTime;				// フェードを行う時間
+		float _fading = 0;				// フェードの経過時間
+		float _fadeStartVolume;			// フェード開始時の音量
+		float _targetVolume;			// フェード中に目指す音量
+		function<void()> _fadeCallback;	// フェードが完了したときに実行される
+
+		class VoiceCallback;			// XAudio2のコールバック
 
 		struct Impl;
 		unique_ptr<Impl> _impl;
@@ -47,7 +54,7 @@ namespace AudioLibrary {
 		void SetVolume(float volume);
 
 		// 再生位置を取得
-		UINT32 GetPosition() const {
+		UINT64 GetPosition() const {
 			return _position;
 		}
 
@@ -60,7 +67,7 @@ namespace AudioLibrary {
 		void UnSetAudioData();
 
 		// 再生システムの情報を更新する
-		void Update();
+		void Update(float deltaTime);
 
 		// 音を再生する
 		HRESULT Play();
@@ -81,6 +88,14 @@ namespace AudioLibrary {
 
 		// データが整っているか調べる
 		HRESULT CheckValidData() const;
+
+		void AddBuffer(UINT32 requredBytes);
+
+		// 内部で使用するためのフェード
+		void SetFade(float targetVolume, float targetTime, function<void()> callback = nullptr);
+
+		// フェード更新
+		void UpdateFade(float deltaTime);
 
 	};
 

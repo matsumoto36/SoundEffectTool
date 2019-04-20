@@ -1,8 +1,10 @@
 #pragma once
 
+#include <map>
 #include <memory>
 #include <functional>
 
+#include "AudioPlayer.h"
 #include "SoundEffectToolDefine.h"
 
 using namespace std;
@@ -10,49 +12,49 @@ using namespace AudioLibrary;
 
 namespace SoundEffectTool {
 
+	// ライブラリのサウンドシステムを制御するクラス
 	class SOUNDEFFECTTOOL_API AudioController {
 
-	public:
-		function<void(bool)> OnIsPlayChanged;	// 再生状態が変化したときに呼ばれる
-		function<void(float)> OnVolumeChanged;	// 音量が変化したときに呼ばれる
-
 	private:
+
+		map<string, shared_ptr<AudioPlayer>> _audioPlayerList;
+
 		struct Impl;
 		unique_ptr<Impl> _impl;
 
 	public:
+		// コピーは禁止するが、ムーブは許可する
+		AudioController(const AudioController&) = delete;
+		AudioController& operator=(const AudioController&) = delete;
+
 		AudioController();
 		~AudioController();
 
-		// 再生中かどうかを取得する
-		bool IsPlay() const;
+		// プレイヤーを作成する(keyをアクセスキーとして登録)
+		bool CreateAudioPlayer(const string& key);
+
+		// プレイヤーを取得する
+		shared_ptr<AudioPlayer> GetAudioPlayer(const string& key);
+
+		// 音声データを取得する
+		shared_ptr<AudioData> GetAudioData(const string& key) const;
 
 		// 情報を更新する
-		void Update() const;
+		void Update(float deltaTime) const;
 
-		// 音声をロードする
-		bool LoadSound(const wstring& filePath, const string& name) const;
+		// 音声をロードする(keyをアクセスキーとして登録)
+		bool LoadSound(const wstring& filePath, const string& key) const;
 
 		// 音声を解放する
-		bool UnLoadSound(const string& name) const;
+		bool UnLoadSound(const string& key) const;
 
-		// 音声を再生可能状態にする
-		bool SetMainSound(const string& name) const;
+	private:
 
-		// 音量を取得する
-		float GetVolume() const;
+		// プレイヤーが存在しているか
+		bool IsValidAudioPlayer(const string& key) const;
 
-		// 音量を設定する
-		void SetVolume(float volume) const;
-
-		// 音声を再生する
-		bool PlayMainSound() const;
-
-		// 音声を停止する
-		bool StopMainSound() const;
-		
-		// 音声を一時停止する
-		bool PauseMainSound() const;
+		// データが存在しているか
+		bool IsValidAudioData(const string& key) const;
 
 	};
 

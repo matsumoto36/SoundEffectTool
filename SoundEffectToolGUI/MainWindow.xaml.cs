@@ -29,6 +29,8 @@ namespace SoundEffectToolGUI {
 		private string _windowName = "DxLib";
 		private TimeSpan _lastRender;
 		private DispatcherTimer _timer;
+		private DateTime _lastTick;
+		private float _soundFileLength;
 
 		private BitmapImage _startButtonImage;
 		private BitmapImage _pauseButtonImage;
@@ -42,6 +44,16 @@ namespace SoundEffectToolGUI {
 				_volume = value;
 				if(_soundEffectToolVM == null) return;
 				_soundEffectToolVM.SetVolume(_volume);
+			}
+		}
+
+		private float _playRatio;
+		public float PlayRatio {
+			get { return _playRatio; }
+			set {
+				_playRatio = value;
+				if(_soundEffectToolVM == null) return;
+				_soundEffectToolVM.PlayMainSoundAtPosition(_playRatio * _soundFileLength);
 			}
 		}
 
@@ -134,6 +146,11 @@ namespace SoundEffectToolGUI {
 			// 音量を変更
 			Volume = (float)e.NewValue;
 		}
+
+		private void PlayPositionSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {
+			// 再生位置を変更
+			//PlayRatio = (float)e.NewValue;
+		}
 		#endregion
 
 		/// <summary>
@@ -164,6 +181,10 @@ namespace SoundEffectToolGUI {
 			_soundEffectToolVM.LoadSound("Resource/Audio/MusicSurround.wav", SoundKey);
 			// メインの音にセット
 			_soundEffectToolVM.SetMainSound(SoundKey);
+
+			// 長さを取得
+			_soundFileLength = _soundEffectToolVM.GetSoundFileLength();
+			SoundFileLengthText.Text = ToTime(_soundFileLength);
 
 			// 再生状況が変化したときにアイコンを変更
 			_soundEffectToolVM.OnAudioIsPlayChanged += isPlay => {
@@ -212,11 +233,21 @@ namespace SoundEffectToolGUI {
 			// タイマー起動
 			_timer = new DispatcherTimer();
 			_timer.Interval = new TimeSpan(1);
+			_lastTick = DateTime.Now;
 			_timer.Tick += (s, e) => {
 
 				// 音楽系情報の更新
-				_soundEffectToolVM.UpdateAudio();
+				_soundEffectToolVM.UpdateAudio((float)(DateTime.Now - _lastTick).TotalSeconds);
+				_lastTick = DateTime.Now;
 
+				var position = _soundEffectToolVM.GetMainPlayerPosition();
+				var ratio = position / _soundFileLength;
+				if(_soundFileLength == 0) {
+					ratio = 0;
+				}
+
+				PlayPositionSlider.Value = _playRatio = ratio;
+				PlayPositionText.Text = ToTime(position);
 			};
 			_timer.Start();
 
@@ -272,6 +303,12 @@ namespace SoundEffectToolGUI {
 		/// </summary>
 		private void PauseSound() {
 			_soundEffectToolVM.PauseMainSound();
+		}
+
+		private string ToTime(float time) {
+			var minites = (int)(time / 60.0f);
+			var seconds = time - minites;
+			return string.Format("{0}:{1:00.00}", minites, seconds);
 		}
 	}
 }

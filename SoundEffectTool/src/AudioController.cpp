@@ -1,14 +1,11 @@
 #include "stdafx.h"
 #include "../include/AudioController.h"
 
-#include <map>
-#include "AudioPlayer.h"
 #include "AudioData.h"
 
 namespace SoundEffectTool {
 
 	struct AudioController::Impl {
-		map<string, unique_ptr<AudioPlayer, AudioPlayerDeleter>> _audioPlayerList;
 		map<string, shared_ptr<AudioData>> _audioDataList;
 	};
 
@@ -18,23 +15,13 @@ namespace SoundEffectTool {
 		// サウンドシステムの初期化
 		auto&& audio = Audio::GetInstance();
 		audio.Initialize();
-
-		// プレーヤーを作る
-		auto player = move(audio.CreateAudioPlayer());
-		
-		// 通知をリンク
-		player->OnIsPlayChanged = [&](bool isPlay) { OnIsPlayChanged(isPlay); };
-		player->OnVolumeChanged = [&](float volume) { OnVolumeChanged(volume); };
-
-		// メインとして追加
-		_impl->_audioPlayerList.emplace("Main", move(player));
 	}
 
 
 	AudioController::~AudioController() {
 
 		// プレイヤーの破棄
-		for (auto&& player : _impl->_audioPlayerList) {
+		for (auto&& player : _audioPlayerList) {
 			player.second.reset();
 		}
 
@@ -43,19 +30,51 @@ namespace SoundEffectTool {
 	
 	}
 
-	bool AudioController::IsPlay() const {
-		return _impl->_audioPlayerList["Main"]->IsPlay();
+	bool AudioController::CreateAudioPlayer(const string& key) {
+
+		if (IsValidAudioPlayer(key)) {
+			printf("already created player. key=%s", key.c_str());
+			return false;
+		}
+
+		// 追加
+		_audioPlayerList.emplace(key, make_shared<AudioPlayer>());
+		return true;
 	}
 
-	void AudioController::Update() const {
-		_impl->_audioPlayerList["Main"]->Update();
+	shared_ptr<AudioPlayer> AudioController::GetAudioPlayer(const string& key) {
+
+		if (!IsValidAudioPlayer(key)) {
+			printf("Player is not found. key=%s", key.c_str());
+			return nullptr;
+		}
+
+		return _audioPlayerList[key];
 	}
 
-	bool AudioController::LoadSound(const wstring& filePath, const string& name) const {
+	shared_ptr<AudioData> AudioController::GetAudioData(const string& key) const {
+
+		if (!IsValidAudioData(key)) {
+			printf("Sound data is not found. key=%s", key.c_str());
+			return nullptr;
+		}
+
+		return _impl->_audioDataList[key];
+	}
+
+	void AudioController::Update(float deltaTime) const {
+
+		for (auto&& player : _audioPlayerList) {
+			player.second->Update(deltaTime);
+		}
+	}
+
+	bool AudioController::LoadSound(const wstring& filePath, const string& key) const {
 
 		// 同じキーで登録できないようにする
-		if (_impl->_audioDataList.count(name) > 0) {
-			printf("already loaded sound data. key=%s", name.c_str());
+		if (IsValidAudioData(key)) {
+			printf("already loaded sound data. key=%s", key.c_str());
+			return false;
 		};
 
 		// ファイル読み込み
@@ -63,72 +82,33 @@ namespace SoundEffectTool {
 
 		if (!audioData) {
 			wprintf(L"failed load sound data. path=%s", filePath.c_str());
+			return false;
 		}
 
 		// 追加
-		_impl->_audioDataList.emplace(name, move(audioData));
+		_impl->_audioDataList.emplace(key, move(audioData));
 		return true;
 	}
 
-	bool AudioController::UnLoadSound(const string& name) const {
+	bool AudioController::UnLoadSound(const string& key) const {
 
-		if (_impl->_audioDataList.count(name) <= 0) {
-			printf("Sound data is not found. key=%s", name.c_str());
+		if (!IsValidAudioData(key)) {
+			printf("Sound data is not found. key=%s", key.c_str());
 			return false;
 		}
 
 		// 削除 (shared_ptrなので開放される予定)
-		_impl->_audioDataList.erase(name);
+		_impl->_audioDataList.erase(key);
 		return true;
 	}
 
-
-	bool AudioController::SetMainSound(const string& name) const {
-
-
-		if (_impl->_audioDataList.count(name) <= 0) {
-			printf("Sound data is not found. key=%s", name.c_str());
-			return false;
-		}
-
-		auto data = _impl->_audioDataList[name];
-		auto&& target = _impl->_audioPlayerList["Main"];
-		// データをセット
-		return FAILED(target->SetAudioData(data));
+	bool AudioController::IsValidAudioPlayer(const string& key) const {
+		return _audioPlayerList.count(key) > 0;
 	}
 
-	float AudioController::GetVolume() const {
-
-		auto&& target = _impl->_audioPlayerList["Main"];
-		return target->GetVolume();
+	bool AudioController::IsValidAudioData(const string& key) const {
+		return _impl->_audioDataList.count(key) > 0;
 	}
 
-	void AudioController::SetVolume(float volume) const {
-		
-		auto&& target = _impl->_audioPlayerList["Main"];
-		target->SetVolume(volume);
-	}
-
-
-	bool AudioController::PlayMainSound() const {
-
-		auto&& target = _impl->_audioPlayerList["Main"];
-		// 再生
-		return FAILED(target->Play());
-	}
-
-	bool AudioController::StopMainSound() const {
-
-		auto&& target = _impl->_audioPlayerList["Main"];
-		// 停止
-		return FAILED(target->Stop());
-	}
-
-	bool AudioController::PauseMainSound() const {
-
-		auto&& target = _impl->_audioPlayerList["Main"];
-		// ポーズ
-		return FAILED(target->Pause());
-	}
 
 }

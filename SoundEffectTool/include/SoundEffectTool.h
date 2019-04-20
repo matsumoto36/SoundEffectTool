@@ -32,9 +32,15 @@ namespace SoundEffectTool {
 		// ウィンドウの生成
 		void CreateDxView(HWND windowHandle, string& rendererName, int width, int height);
 
-		const Renderer& GetRenderer(string& rendererName);
+		const unique_ptr<Renderer>& GetRenderer(string& rendererName);
 
 		AudioController& GetAudioController() const;
+
+		// 音声データをプレイヤーにセット
+		bool SetSoundData(string& playerKey, string& audioDataKey);
+
+		// 波形データを描画にセット
+		bool SetWaveData(string& rendererName, string& key);
 
 	private:
 

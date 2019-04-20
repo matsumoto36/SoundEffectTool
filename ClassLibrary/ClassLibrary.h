@@ -4,6 +4,7 @@ using namespace System;
 
 namespace SoundEffectTool {
 
+	// GUIとシステムをつなぐ橋渡し的存在
 	public ref class SoundEffectToolVM {
 
 	internal:
@@ -35,22 +36,25 @@ namespace SoundEffectTool {
 		const IntPtr GetBackBuffer(String^ windowName);
 
 		// 描画サイズを変更する
-		void ChangeDrawSize(String^ windowName, int width, int height);
+		bool ChangeDrawSize(String^ windowName, int width, int height);
 
 		// 描画する
-		void Draw(String^ windowName);
+		bool Draw(String^ windowName);
 
 		// 音声の情報を更新する
-		void UpdateAudio();
+		void UpdateAudio(float deltaTime);
 
-		// 音声をロードする
-		bool LoadSound(String^ filePath, String^ name);
+		// 音声をロードする(keyをアクセスキーとして登録)
+		bool LoadSound(String^ filePath, String^ key);
 
 		// 音声を解放する
-		bool UnLoadSound(String^ name);
+		bool UnLoadSound(String^ key);
 
 		// 音声を再生可能状態にする
-		bool SetMainSound(String^ name);
+		bool SetMainSound(String^ key);
+
+		// 音声を描画にセット
+		bool SetWaveData(String^ windowName, String^ key);
 
 		// 再生しているかを取得する
 		bool IsPlay();
@@ -61,8 +65,17 @@ namespace SoundEffectTool {
 		// 音量を設定する
 		void SetVolume(float volume);
 
+		// 再生位置を取得する
+		float GetMainPlayerPosition();
+
+		// 音声の長さを取得する
+		float GetSoundFileLength();
+
 		// 音声を再生する
 		bool PlayMainSound();
+
+		// 音声を途中から再生する
+		bool PlayMainSoundAtPosition(float position);
 
 		// 音声を停止する
 		bool StopMainSound();

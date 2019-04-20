@@ -3,6 +3,6 @@
 
 // AudioLibrary
 namespace AudioLibrary {
-	class AudioPlayer;
+	class AudioData;
 	struct AudioPlayerDeleter;
 }

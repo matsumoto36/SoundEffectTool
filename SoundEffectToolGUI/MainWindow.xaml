@@ -43,17 +43,30 @@
 
                     <xcad:LayoutAnchorablePane DockHeight="60">
                         <xcad:LayoutAnchorable ContentId="control" Title="Control">
-                            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="20">
-                                <Button x:Name="StopButton" HorizontalAlignment="Left" Height="48" Margin="0" Grid.Row="1" VerticalAlignment="Top" Width="48" RenderTransformOrigin="1.097,1.321" Click="StopButton_Click">
-                                    <Image Source="Resource/Texture/Stop.png" Stretch="Fill"/>
-                                </Button>
-                                <Button x:Name="StartButton" HorizontalAlignment="Left" Height="48" Margin="10,0,0,0" VerticalAlignment="Top" Width="48" RenderTransformOrigin="1.097,1.321" Click="StartButton_Click">
-                                    <Image x:Name="StartButtonImage" Source="Resource/Texture/Play.png" Stretch="Fill"/>
-                                </Button>
-                                <Button x:Name="MuteButton" HorizontalAlignment="Left" Height="24" Margin="10,20,0,0" VerticalAlignment="Top" Width="24" RenderTransformOrigin="1.097,1.321" Click="MuteButton_Click">
-                                    <Image x:Name="MuteButtonImage" Source="Resource/Texture/Volume.png" Stretch="Fill"/>
-                                </Button>
-                                <Slider x:Name="VolumeSlider" Width="167" Margin="10,20,0,0" Value="1" Maximum="1" LargeChange="0" ValueChanged="VolumeSlider_ValueChanged"/>
+                            <StackPanel DockPanel.Dock="Top" Orientation="Vertical" Margin="10">
+                                <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="20">
+                                    <Button x:Name="StopButton" HorizontalAlignment="Left" Height="48" Margin="0" Grid.Row="1" VerticalAlignment="Top" Width="48" RenderTransformOrigin="1.097,1.321" Click="StopButton_Click">
+                                        <Image Source="Resource/Texture/Stop.png" Stretch="Fill"/>
+                                    </Button>
+                                    <Button x:Name="StartButton" HorizontalAlignment="Left" Height="48" Margin="10,0,0,0" VerticalAlignment="Top" Width="48" RenderTransformOrigin="1.097,1.321" Click="StartButton_Click">
+                                        <Image x:Name="StartButtonImage" Source="Resource/Texture/Play.png" Stretch="Fill"/>
+                                    </Button>
+                                    <Button x:Name="MuteButton" HorizontalAlignment="Left" Height="24" Margin="10,20,0,0" VerticalAlignment="Top" Width="24" RenderTransformOrigin="1.097,1.321" Click="MuteButton_Click">
+                                        <Image x:Name="MuteButtonImage" Source="Resource/Texture/Volume.png" Stretch="Fill"/>
+                                    </Button>
+                                    <Slider x:Name="VolumeSlider" Width="167" Margin="10,20,0,0" Value="1" Maximum="1" LargeChange="0" ValueChanged="VolumeSlider_ValueChanged"/>
+                                </StackPanel>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="50"/>
+                                        <ColumnDefinition />
+                                        <ColumnDefinition Width="50"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBox x:Name="PlayPositionText" Text="00:00" HorizontalAlignment="Center"/>
+                                    <Slider x:Name="PlayPositionSlider" Margin="10,0,10,0" Value="0" Maximum="1" LargeChange="0" Grid.Column="1" ValueChanged="PlayPositionSlider_ValueChanged"/>
+                                    <TextBox x:Name="SoundFileLengthText" Text="00:00" DockPanel.Dock="Right" Grid.Column="2" HorizontalAlignment="Center"/>
+                                </Grid>
                             </StackPanel>
                         </xcad:LayoutAnchorable>
                     </xcad:LayoutAnchorablePane>

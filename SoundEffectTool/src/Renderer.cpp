@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "../include/SoundEffectTool.h"
+#include "../include/Renderer.h"
 #include "DxLib.h"
 
 using namespace DxLib;
@@ -50,8 +50,37 @@ namespace SoundEffectTool {
 		return GetUseDirect3D9BackBufferSurface();
 	}
 
-	void Renderer::SetWaveData(const unique_ptr<uint8_t[]>& waveData, UINT32 length, int channels) {
-		// todo
+	void Renderer::SetAndSplitWaveData(const unique_ptr<uint8_t[]>& waveData, UINT32 length, int channels) {
+		
+		_wavePerChannel.clear();
+		_wavePerChannel.resize(channels);
+		
+		// チャンネルごとの位置格納用
+		int* currents = new int[channels];
+
+		for (size_t i = 0; i < (size_t)channels; i++) {
+			// 割り切れるはず
+			_wavePerChannel[i] = make_unique<uint8_t[]>(length / channels);
+			currents[i] = 0;
+		}
+
+		UINT32 position = 0;
+		auto finished = false;
+
+		// 波形をチャンネルごとに分けてコピー
+		while (!finished) {
+			for (size_t i = 0; i < _wavePerChannel.size(); i++) {
+
+				_wavePerChannel[i][currents[i]++] = waveData[position];
+
+				if (length > ++position) {
+					finished = true;
+					break;
+				}
+			}
+		}
+
+		delete[] currents;
 	}
 
 	void Renderer::ChangeDrawSize(int width, int height) {
