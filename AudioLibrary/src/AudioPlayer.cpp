@@ -39,7 +39,7 @@ namespace AudioLibrary {
 		unique_ptr<IXAudio2VoiceCallback> _callback;	// ソースボイスのコールバック
 		shared_ptr<AudioData> _audioData;				// 再生する音声データ
 		
-		const float FadeTime = 0.05f;					// 内部フェードの時間
+		const float FadeTime = 0.1f;					// 内部フェードの時間
 		float _xaudio2Volume;							// 詳細な音量 内部フェードの制御用
 
 		// XAudio2のコールバックをラップする
@@ -277,7 +277,7 @@ namespace AudioLibrary {
 				break;
 		}
 
-		SetFade(0, _impl->FadeTime, [&]() {
+		//SetFade(0, _impl->FadeTime, [&]() {
 
 			if (FAILED(hr = _impl->_sourceVoice->Stop())) {
 				wprintf(L"Error %#X failed stop audio\n", hr);
@@ -288,7 +288,7 @@ namespace AudioLibrary {
 			// 止めて最初から再生したい場合はFlushSourceBuffersを実行する
 			_impl->_sourceVoice->FlushSourceBuffers();
 		
-		});
+		//});
 		SetPlayerStatus(AudioPlayerStatus::Stop);
 
 
@@ -312,14 +312,14 @@ namespace AudioLibrary {
 		}
 
 		// Stopが一時停止になる
-		SetFade(0, _impl->FadeTime, [&]() {
+		//SetFade(0, _impl->FadeTime, [&]() {
 
 			if (FAILED(hr = _impl->_sourceVoice->Stop())) {
 				wprintf(L"Error %#X failed stop audio\n", hr);
 				return hr;
 			}
 
-		});
+		//});
 		SetPlayerStatus(AudioPlayerStatus::Pause);
 
 		return hr;
@@ -350,9 +350,10 @@ namespace AudioLibrary {
 
 	void AudioPlayer::AddBuffer(UINT32 requredBytes) {
 
-		auto&& p = _impl->_audioData->GetWave();
+		auto&& p = _impl->_audioData->GetBuffer().pAudioData;
 		XAUDIO2_BUFFER buf = { 0 };
 		buf.pAudioData = &p[_seekData];
+		volatile auto a = p[_seekData];
 
 		// リクエストに対して存在しているサンプルを計算
 		auto length = _impl->_audioData->GetBuffer().AudioBytes;
@@ -367,6 +368,7 @@ namespace AudioLibrary {
 				return;
 			}
 			buf.AudioBytes = bytes;
+			// ストリーミング再生終了フラグ
 			buf.Flags = XAUDIO2_END_OF_STREAM;
 			_seekData += bytes;
 		}

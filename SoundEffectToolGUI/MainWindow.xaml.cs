@@ -28,7 +28,10 @@ namespace SoundEffectToolGUI {
 		private SoundEffectToolVM _soundEffectToolVM;
 		private string _windowName = "DxLib";
 		private TimeSpan _lastRender;
-		private DispatcherTimer _timer;
+
+		private DispatcherTimer _audioTick;
+		private DispatcherTimer _playerPositionTick;
+
 		private DateTime _lastTick;
 		private float _soundFileLength;
 
@@ -231,12 +234,12 @@ namespace SoundEffectToolGUI {
 		private void SetupTimer() {
 
 			// タイマー起動
-			_timer = new DispatcherTimer();
-			_timer.Interval = new TimeSpan(1);
+			_audioTick = new DispatcherTimer();
+			_audioTick.Interval = new TimeSpan(1);
 			_lastTick = DateTime.Now;
-			_timer.Tick += (s, e) => {
+			_audioTick.Tick += (s, e) => {
 
-				// 音楽系情報の更新
+				// 音楽系更新
 				_soundEffectToolVM.UpdateAudio((float)(DateTime.Now - _lastTick).TotalSeconds);
 				_lastTick = DateTime.Now;
 
@@ -246,13 +249,23 @@ namespace SoundEffectToolGUI {
 					ratio = 0;
 				}
 
-				PlayPositionSlider.Value = _playRatio = ratio;
+				// 再生情報
+				_playRatio = ratio;
 				PlayPositionText.Text = ToTime(position);
 			};
-			_timer.Start();
+			_audioTick.Start();
+
+			// 一秒ごとに再生位置の表示更新
+			_playerPositionTick = new DispatcherTimer();
+			_playerPositionTick.Interval = new TimeSpan(0, 0, 1);
+			_playerPositionTick.Tick += (s, e) => {
+				PlayPositionSlider.Value = _playRatio;
+			};
+			_playerPositionTick.Start();
 
 			Closed += (s, e) => {
-				_timer.Stop();
+				_audioTick.Stop();
+				_playerPositionTick.Stop();
 			};
 		}
 

@@ -16,7 +16,7 @@ namespace AudioLibrary {
 	// 読み込んだサウンドのデータ
 	class AUDIOLIBRARY_API AudioData {
 
-		unique_ptr<uint8_t[]> _wave;	// 波形本体
+		unique_ptr<uint8_t[]> _wave;	// ファイルデータ本体
 		UINT32 _length;					// 波形の長さ(サンプル数)
 
 		struct Impl;
