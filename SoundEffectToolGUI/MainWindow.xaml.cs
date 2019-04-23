@@ -227,6 +227,8 @@ namespace SoundEffectToolGUI {
 				}
 				catch { /* キャンセルされたときは握りつぶす */ }
 			};
+
+				//PlayPositionSlider.
 		}
 		/// <summary>
 		/// タイマーを準備する
@@ -322,6 +324,14 @@ namespace SoundEffectToolGUI {
 			var minites = (int)(time / 60.0f);
 			var seconds = time - minites;
 			return string.Format("{0}:{1:00.00}", minites, seconds);
+		}
+
+		private void PlayPositionSlider_DragEnter(object sender, DragEventArgs e) {
+
+		}
+
+		private void PlayPositionSlider_Drop(object sender, DragEventArgs e) {
+
 		}
 	}
 }
