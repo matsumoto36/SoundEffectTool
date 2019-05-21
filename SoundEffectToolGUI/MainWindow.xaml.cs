@@ -30,10 +30,10 @@ namespace SoundEffectToolGUI {
 		private TimeSpan _lastRender;
 
 		private DispatcherTimer _audioTick;
-		private DispatcherTimer _playerPositionTick;
 
 		private DateTime _lastTick;
 		private float _soundFileLength;
+		private bool _playerPositionChanging;
 
 		private BitmapImage _startButtonImage;
 		private BitmapImage _pauseButtonImage;
@@ -50,15 +50,7 @@ namespace SoundEffectToolGUI {
 			}
 		}
 
-		private float _playRatio;
-		public float PlayRatio {
-			get { return _playRatio; }
-			set {
-				_playRatio = value;
-				if(_soundEffectToolVM == null) return;
-				_soundEffectToolVM.PlayMainSoundAtPosition(_playRatio * _soundFileLength);
-			}
-		}
+		public float PlayRatio { get; set; }
 
 		public MainWindow() {
 			InitializeComponent();
@@ -150,9 +142,17 @@ namespace SoundEffectToolGUI {
 			Volume = (float)e.NewValue;
 		}
 
-		private void PlayPositionSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {
-			// 再生位置を変更
-			//PlayRatio = (float)e.NewValue;
+		private void PlayPositionSlider_MouseDown(object sender, MouseButtonEventArgs e) {
+			_playerPositionChanging = true;
+		}
+
+		private void PlayPositionSlider_MouseUp(object sender, MouseButtonEventArgs e) {
+			_playerPositionChanging = false;
+			PlayRatio = (float)PlayPositionSlider.Value;
+			if(_soundEffectToolVM.IsPlay()) {
+				// 再生位置を変更して再生
+				_soundEffectToolVM.PlayMainSoundAtPosition(PlayRatio * _soundFileLength);
+			}
 		}
 		#endregion
 
@@ -241,8 +241,11 @@ namespace SoundEffectToolGUI {
 			_lastTick = DateTime.Now;
 			_audioTick.Tick += (s, e) => {
 
+				if(!_soundEffectToolVM.IsPlay()) return;
+
 				// 音楽系更新
-				_soundEffectToolVM.UpdateAudio((float)(DateTime.Now - _lastTick).TotalSeconds);
+				var deltaTime = (float)(DateTime.Now - _lastTick).TotalSeconds;
+				_soundEffectToolVM.UpdateAudio(deltaTime);
 				_lastTick = DateTime.Now;
 
 				var position = _soundEffectToolVM.GetMainPlayerPosition();
@@ -252,22 +255,20 @@ namespace SoundEffectToolGUI {
 				}
 
 				// 再生情報
-				_playRatio = ratio;
+				PlayRatio = ratio;
 				PlayPositionText.Text = ToTime(position);
+
+				// 一秒ごとに再生位置の表示更新
+				if (Math.Floor(position) != Math.Floor(position - deltaTime) && !_playerPositionChanging) {
+					PlayPositionSlider.Value = PlayRatio;
+				}
+
 			};
 			_audioTick.Start();
 
-			// 一秒ごとに再生位置の表示更新
-			_playerPositionTick = new DispatcherTimer();
-			_playerPositionTick.Interval = new TimeSpan(0, 0, 1);
-			_playerPositionTick.Tick += (s, e) => {
-				PlayPositionSlider.Value = _playRatio;
-			};
-			_playerPositionTick.Start();
 
 			Closed += (s, e) => {
 				_audioTick.Stop();
-				_playerPositionTick.Stop();
 			};
 		}
 
@@ -303,7 +304,8 @@ namespace SoundEffectToolGUI {
 		/// セットした音声を再生する
 		/// </summary>
 		private void PlaySound() {
-			_soundEffectToolVM.PlayMainSound();
+			var b = _soundEffectToolVM.PlayMainSoundAtPosition(PlayRatio * _soundFileLength);
+			Console.Write(b);
 		}
 
 		/// <summary>
@@ -311,6 +313,7 @@ namespace SoundEffectToolGUI {
 		/// </summary>
 		private void StopSound() {
 			_soundEffectToolVM.StopMainSound();
+			PlayPositionSlider.Value = PlayRatio = 0.0f;
 		}
 
 		/// <summary>
@@ -320,18 +323,15 @@ namespace SoundEffectToolGUI {
 			_soundEffectToolVM.PauseMainSound();
 		}
 
+		/// <summary>
+		/// 時間を表示するテキストに変換
+		/// </summary>
+		/// <param name="time"></param>
+		/// <returns></returns>
 		private string ToTime(float time) {
 			var minites = (int)(time / 60.0f);
 			var seconds = time - minites;
 			return string.Format("{0}:{1:00.00}", minites, seconds);
-		}
-
-		private void PlayPositionSlider_DragEnter(object sender, DragEventArgs e) {
-
-		}
-
-		private void PlayPositionSlider_Drop(object sender, DragEventArgs e) {
-
 		}
 	}
 }

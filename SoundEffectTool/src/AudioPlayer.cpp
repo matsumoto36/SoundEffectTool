@@ -70,19 +70,19 @@ namespace SoundEffectTool {
 		_position = position;
 		if (position != 0) {
 			auto samples = (UINT32)(_impl->_samplesPerSec * position);
-			return FAILED(_impl->_player->PlayAtPosition(samples));
+			return SUCCEEDED(_impl->_player->PlayAtPosition(samples));
 		}
 		else {
-			return FAILED(_impl->_player->Play());
+			return SUCCEEDED(_impl->_player->Play());
 		}
 	}
 
 	bool AudioPlayer::Stop() {
 		_position = 0;
-		return FAILED(_impl->_player->Stop());
+		return SUCCEEDED(_impl->_player->Stop());
 	}
 
 	bool AudioPlayer::Pause() const {
-		return FAILED(_impl->_player->Pause());
+		return SUCCEEDED(_impl->_player->Pause());
 	}
 }
