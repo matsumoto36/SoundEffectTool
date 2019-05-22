@@ -188,60 +188,23 @@ namespace AudioLibrary {
 
 	}
 
-	HRESULT AudioPlayer::Play() {
-		
-		auto hr = S_OK;
-		if (FAILED(hr = CheckValidData())) return hr;
-
-		switch (_status) {
-			case AudioPlayerStatus::Play:
-				return E_FAIL;
-			case AudioPlayerStatus::Stop:
-				// 停止状態からはバッファの補給が必要
-				//auto buffer = _impl->_audioData->GetBuffer();
-				//if (FAILED(hr = _impl->_sourceVoice->SubmitSourceBuffer(&buffer))) {
-				//	wprintf(L"Error %#X submitting source buffer\n", hr);
-				//	return hr;
-				//}
-				_seekData = 0;
-				//AddBuffer(1764000);
-				break;
-			case AudioPlayerStatus::Pause:
-				/* ポーズからの復帰はバッファは既に存在している */
-				break;
-			default:
-				break;
-		}
-
-		// 音量の設定
-		SetFade(_volume, _impl->FadeTime);
-
-		// 再生
-		if (FAILED(hr = _impl->_sourceVoice->Start(0))) {
-			wprintf(L"Error %#X failed play audio\n", hr);
-			return hr;
-		}
-
-		SetPlayerStatus(AudioPlayerStatus::Play);
-
-		return hr;
-	}
-
-	HRESULT AudioPlayer::PlayAtPosition(UINT32 samples) {
+	HRESULT AudioPlayer::Play(UINT32 samples) {
 
 		Stop();
 
 		auto hr = S_OK;
 		if (FAILED(hr = CheckValidData())) return hr;
 
-		// 指定した位置からのバッファを指定
-		//auto buffer = _impl->_audioData->GetBuffer();
-		//buffer.PlayBegin = samples;
-		//hr = _impl->_sourceVoice->SubmitSourceBuffer(&buffer);
-		//if (FAILED(hr)) {
-		//	wprintf(L"Error %#X submitting source buffer\n", hr);
-		//	return hr;
-		//}
+		switch (_status) {
+			case AudioPlayerStatus::Play:
+				break;
+			case AudioPlayerStatus::Stop:
+				break;
+			case AudioPlayerStatus::Pause:
+				break;
+			default:
+				break;
+		}
 
 		_position = samples;
 		auto blockAlign = _impl->_audioData->GetFormat().nBlockAlign;
@@ -252,11 +215,12 @@ namespace AudioLibrary {
 
 
 		// 再生
-		//AddBuffer(1764);
 		if (FAILED(hr = _impl->_sourceVoice->Start(0))) {
 			wprintf(L"Error %#X failed play audio\n", hr);
 			return hr;
 		}
+
+		SetPlayerStatus(AudioPlayerStatus::Play);
 
 		return hr;
 	}

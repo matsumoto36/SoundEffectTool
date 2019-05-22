@@ -70,10 +70,7 @@ namespace AudioLibrary {
 		void Update(float deltaTime);
 
 		// ‰¹‚ğÄ¶‚·‚é
-		HRESULT Play();
-
-		// ‰¹‚ğˆÊ’uw’è‚µ‚ÄÄ¶‚·‚é
-		HRESULT PlayAtPosition(UINT32 samples);
+		HRESULT Play(UINT32 samples);
 
 		// ‰¹‚ğ~‚ß‚é
 		HRESULT Stop();

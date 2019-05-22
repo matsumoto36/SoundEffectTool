@@ -19,6 +19,7 @@ namespace SoundEffectTool {
 		int _maxWidth, _maxHeight;		// 出力される画面の最大サイズ
 		int _width, _height;
 
+		UINT32 _waveLength;
 		vector<unique_ptr<uint8_t[]>> _wavePerChannel;
 
 	public:

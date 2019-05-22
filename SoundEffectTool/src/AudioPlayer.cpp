@@ -68,13 +68,8 @@ namespace SoundEffectTool {
 	bool AudioPlayer::PlayStart(float position) {
 
 		_position = position;
-		if (position != 0) {
-			auto samples = (UINT32)(_impl->_samplesPerSec * position);
-			return SUCCEEDED(_impl->_player->PlayAtPosition(samples));
-		}
-		else {
-			return SUCCEEDED(_impl->_player->Play());
-		}
+		auto samples = (UINT32)(_impl->_samplesPerSec * position);
+		return SUCCEEDED(_impl->_player->Play(samples));
 	}
 
 	bool AudioPlayer::Stop() {

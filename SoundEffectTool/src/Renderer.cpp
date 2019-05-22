@@ -55,6 +55,8 @@ namespace SoundEffectTool {
 		_wavePerChannel.clear();
 		_wavePerChannel.resize(channels);
 		
+		_waveLength = length;
+
 		// チャンネルごとの位置格納用
 		int* currents = new int[channels];
 
@@ -94,8 +96,24 @@ namespace SoundEffectTool {
 		//画面を消す
 		ClearDrawScreen();
 
-		// デバッグ
-		DrawBox(0, 0, 100, 100, GetColor(255, 0, 0), 1);
+		auto samples = _waveLength / _wavePerChannel.size();
+
+		auto waveColor = GetColor(0, 0, 255);
+		auto maxHeight = 100;
+		auto width = 1024;
+		auto margin = 20;
+		auto start = 0U;
+		auto end = samples;
+
+		auto x = 0;
+		auto y = margin + maxHeight / 2;
+		for (auto&& channel : _wavePerChannel) {
+			for (size_t i = 0; i < width; i++) {
+
+				DrawLine()
+				channel[i]
+			}
+		}
 
 		ScreenFlip();
 	}

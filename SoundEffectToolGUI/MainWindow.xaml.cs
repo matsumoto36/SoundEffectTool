@@ -148,11 +148,15 @@ namespace SoundEffectToolGUI {
 
 		private void PlayPositionSlider_MouseUp(object sender, MouseButtonEventArgs e) {
 			_playerPositionChanging = false;
-			PlayRatio = (float)PlayPositionSlider.Value;
 			if(_soundEffectToolVM.IsPlay()) {
 				// 再生位置を変更して再生
 				_soundEffectToolVM.PlayMainSoundAtPosition(PlayRatio * _soundFileLength);
 			}
+		}
+
+		private void PlayPositionSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {
+			PlayRatio = (float)PlayPositionSlider.Value;
+			PlayPositionText.Text = ToTime(PlayRatio * _soundFileLength);
 		}
 		#endregion
 
@@ -282,7 +286,7 @@ namespace SoundEffectToolGUI {
 			var args = (RenderingEventArgs)e;
 			if(D3DImage.IsFrontBufferAvailable && _lastRender != args.RenderingTime) {
 
-				IntPtr backBuffer = _soundEffectToolVM.GetBackBuffer(_windowName);
+				var backBuffer = _soundEffectToolVM.GetBackBuffer(_windowName);
 				if(backBuffer != IntPtr.Zero) {
 
 					D3DImage.Lock();
@@ -304,8 +308,7 @@ namespace SoundEffectToolGUI {
 		/// セットした音声を再生する
 		/// </summary>
 		private void PlaySound() {
-			var b = _soundEffectToolVM.PlayMainSoundAtPosition(PlayRatio * _soundFileLength);
-			Console.Write(b);
+			_soundEffectToolVM.PlayMainSoundAtPosition(PlayRatio * _soundFileLength);
 		}
 
 		/// <summary>
