@@ -50,8 +50,11 @@ namespace SoundEffectTool {
 		return GetUseDirect3D9BackBufferSurface();
 	}
 
-	void Renderer::SetAndSplitWaveData(const unique_ptr<uint8_t[]>& waveData, UINT32 length, int channels) {
-		
+	void Renderer::CalcWaveData(const shared_ptr<AudioData> audioData) {
+		//const unique_ptr<uint8_t[]>& waveData, UINT32 length, int channels
+		// éQè∆
+		_audioData = audioData;
+
 		_wavePerChannel.clear();
 		_wavePerChannel.resize(channels);
 		
