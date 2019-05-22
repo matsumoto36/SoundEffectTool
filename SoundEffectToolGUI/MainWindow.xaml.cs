@@ -53,9 +53,11 @@ namespace SoundEffectToolGUI {
 		public float PlayRatio { get; set; }
 
 		public MainWindow() {
-			InitializeComponent();
 
 			_soundEffectToolVM = new SoundEffectToolVM();
+
+			InitializeComponent();
+
 			DataContext = _soundEffectToolVM;
 
 			// 画像の読み込み
@@ -66,10 +68,13 @@ namespace SoundEffectToolGUI {
 
 			// タイマー準備
 			SetupTimer();
+
+			// 描画対象に設定
+			var b = _soundEffectToolVM.SetWaveData(_windowName, SoundKey);
 		}
 
 		#region Events
-		private void Image_Loaded(object sender, RoutedEventArgs e) {
+		private void Image_Initialized(object sender, EventArgs e) {
 
 			// ウィンドウハンドルを生成
 			var hwndSrc = new HwndSource(0, 0, 0, 0, 0, "DxLib", IntPtr.Zero);
@@ -82,9 +87,6 @@ namespace SoundEffectToolGUI {
 			// 描画の更新
 			CompositionTarget.Rendering += UpdateRendering;
 			D3DImage.IsFrontBufferAvailableChanged += D3DImage_IsFrontBufferAvailableChanged;
-
-			// 描画対象に設定
-			var b = _soundEffectToolVM.SetWaveData(_windowName, SoundKey);
 		}
 
 		private void Image_SizeChanged(object sender, SizeChangedEventArgs e) {
@@ -297,7 +299,7 @@ namespace SoundEffectToolGUI {
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
 		private void UpdateRendering(object sender, EventArgs e) {
-
+			
 			var args = (RenderingEventArgs)e;
 			if(D3DImage.IsFrontBufferAvailable && _lastRender != args.RenderingTime) {
 

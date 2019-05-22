@@ -24,7 +24,8 @@ namespace SoundEffectTool {
 		int _waveHeight = 100;
 		uint8_t _waveMax;
 		vector<unique_ptr<uint8_t[]>> _wavePerChannel;
-		vector<unique_ptr<uint8_t[]>> _waveDrawingData;
+		//vector<unique_ptr<uint8_t[]>> _waveDrawingData;
+		vector<vector<uint8_t>> _waveDrawingData;
 
 	public:
 

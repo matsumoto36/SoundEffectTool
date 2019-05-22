@@ -207,7 +207,7 @@
 
                         <xcad:LayoutAnchorablePane DockWidth="125" DockHeight="Auto">
                             <xcad:LayoutAnchorable ContentId="wave" Title="Wave" >
-                                <Image x:Name="Image" Height="Auto" Loaded="Image_Loaded" SizeChanged="Image_SizeChanged" Stretch="None">
+                                <Image x:Name="Image" Height="Auto" SizeChanged="Image_SizeChanged" Stretch="None" Initialized="Image_Initialized">
                                     <Image.Source>
                                         <i:D3DImage x:Name="D3DImage"></i:D3DImage>
                                     </Image.Source>

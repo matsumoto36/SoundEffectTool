@@ -68,14 +68,14 @@ namespace SoundEffectTool {
 
 		UINT32 position = 0;
 		auto finished = false;
-		_waveMax = 0;
+		_waveMax = 255;
 
 		// 波形をチャンネルごとに分けてコピー
 		while (!finished) {
 			for (size_t i = 0; i < _wavePerChannel.size(); i++) {
 				
 				auto wave = waveData[position];
-				if (wave > _waveMax) _waveMax = wave;
+				//if (wave > _waveMax) _waveMax = wave;
 
 				// 比率でコピー
 				_wavePerChannel[i][currents[i]++] = wave;
@@ -90,7 +90,8 @@ namespace SoundEffectTool {
 		delete[] currents;
 
 		// デフォルトの設定
-		SetRenderingData(1024, 100, 0, length / channels);
+		//SetRenderingData(1024, 100, 0, length / channels);
+		SetRenderingData(1024, 100, 0, 2048);
 	}
 
 	void Renderer::SetRenderingData(int waveWidth, int waveHeight, UINT32 start, UINT32 end) {
@@ -100,12 +101,11 @@ namespace SoundEffectTool {
 		_waveWidth = waveWidth;
 		_waveHeight = waveHeight;
 		_waveLength = end - start;
-
-
 		
 		for (size_t i = 0; i < _waveDrawingData.size(); i++) {
 
-			_waveDrawingData[i] = make_unique<uint8_t[]>(waveWidth);
+			//_waveDrawingData[i] = make_unique<uint8_t[]>(waveWidth);
+			_waveDrawingData[i].resize(waveWidth);
 
 			for (size_t j = 0; j < waveWidth; j++) {
 				size_t position = start + (float)j / waveWidth * _waveLength;
@@ -131,14 +131,14 @@ namespace SoundEffectTool {
 		auto waveColor = GetColor(0, 0, 255);
 		auto margin = 20;
 
-		auto x = 0;
 		auto y = 0;
 		for (auto&& channel : _waveDrawingData) {
 			
-			auto prev = channel[0];
+			auto prev = channel[0] - 128;
+			auto x = 0;
 
 			for (size_t i = 1; i < _waveWidth; i++) {
-				auto s = channel[i];
+				auto s = channel[i] - 128;
 				DrawLine(x + i - 1, y + prev, x + i, y + s, waveColor);
 				prev = s;
 			}
