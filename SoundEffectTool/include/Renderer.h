@@ -21,6 +21,7 @@ namespace SoundEffectTool {
 
 		UINT32 _waveLength = 0;
 		int _waveWidth = 1024;
+		int _waveHeight = 100;
 		uint8_t _waveMax;
 		vector<unique_ptr<uint8_t[]>> _wavePerChannel;
 		vector<unique_ptr<uint8_t[]>> _waveDrawingData;
@@ -44,7 +45,7 @@ namespace SoundEffectTool {
 		void SetAndSplitWaveData(const unique_ptr<uint8_t[]>& waveData, UINT32 length, int channels);
 
 		// 波形の長さと位置を変更
-		void SetRenderingData(int waveWidth, UINT32 start, UINT32 end);
+		void SetRenderingData(int waveWidth, int waveHeight, UINT32 start, UINT32 end);
 
 		// 描画のサイズを変更する
 		void ChangeDrawSize(int width, int height);

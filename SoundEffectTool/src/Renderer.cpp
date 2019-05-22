@@ -62,7 +62,6 @@ namespace SoundEffectTool {
 
 		for (size_t i = 0; i < (size_t)channels; i++) {
 			// 割り切れるはず
-			//_wavePerChannel[i] = make_unique<float[]>(length / channels);
 			_wavePerChannel[i] = make_unique<uint8_t[]>(length / channels);
 			currents[i] = 0;
 		}
@@ -76,10 +75,9 @@ namespace SoundEffectTool {
 			for (size_t i = 0; i < _wavePerChannel.size(); i++) {
 				
 				auto wave = waveData[position];
-				if (wave < _waveMax) _waveMax = wave;
+				if (wave > _waveMax) _waveMax = wave;
 
 				// 比率でコピー
-				//_wavePerChannel[i][currents[i]++] = (float)waveData[position] / 255;
 				_wavePerChannel[i][currents[i]++] = wave;
 
 				if (length < ++position) {
@@ -90,24 +88,29 @@ namespace SoundEffectTool {
 		}
 
 		delete[] currents;
+
+		// デフォルトの設定
+		SetRenderingData(1024, 100, 0, length / channels);
 	}
 
 	void Renderer::SetRenderingData(int waveWidth, int waveHeight, UINT32 start, UINT32 end) {
 
 		_waveDrawingData.clear();
 		_waveDrawingData.resize(_wavePerChannel.size());
-		_waveLength = waveWidth;
+		_waveWidth = waveWidth;
+		_waveHeight = waveHeight;
+		_waveLength = end - start;
 
-		auto length = end - start;
+
 		
 		for (size_t i = 0; i < _waveDrawingData.size(); i++) {
 
 			_waveDrawingData[i] = make_unique<uint8_t[]>(waveWidth);
 
 			for (size_t j = 0; j < waveWidth; j++) {
-				auto position = start + (float)i / waveWidth * length;
-				_waveDrawingData[i][j] = 
-					_wavePerChannel[i][position] / _waveMax * waveHeight;
+				size_t position = start + (float)j / waveWidth * _waveLength;
+				auto sample = (float)_wavePerChannel[i][position] / _waveMax * waveHeight;
+				_waveDrawingData[i][j] = sample;
 			}
 		}
 	}
@@ -125,29 +128,22 @@ namespace SoundEffectTool {
 
 		if (_waveLength <= 0) return;
 
-		auto samples = _waveLength / _wavePerChannel.size();
-
 		auto waveColor = GetColor(0, 0, 255);
-		auto maxHeight = 100;
-		auto width = 1024;
 		auto margin = 20;
-		auto start = 0U;
-		auto end = samples;
-		auto length = end - start;
 
 		auto x = 0;
-		auto y = margin + maxHeight;
-		for (auto&& channel : _wavePerChannel) {
+		auto y = 0;
+		for (auto&& channel : _waveDrawingData) {
 			
-			auto prev = channel[start] * maxHeight;
+			auto prev = channel[0];
 
-			for (size_t i = 1; i < width; i++) {
-				auto sample = (float)channel[start + (float)i / width * length] / _waveMax * maxHeight;
-				DrawLine(x + i - 1, prev, x + i, sample, waveColor);
-				prev = sample;
+			for (size_t i = 1; i < _waveWidth; i++) {
+				auto s = channel[i];
+				DrawLine(x + i - 1, y + prev, x + i, y + s, waveColor);
+				prev = s;
 			}
 
-			y += margin + maxHeight;
+			y += margin + _waveHeight;
 		}
 
 		ScreenFlip();
