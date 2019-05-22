@@ -191,7 +191,7 @@
                                     </Grid.ColumnDefinitions>
 
                                     <TextBox x:Name="PlayPositionText" Text="00:00" HorizontalAlignment="Center"/>
-                                    <Slider x:Name="PlayPositionSlider" Margin="10,0,10,0" Value="0" Maximum="1" Grid.Column="1" Style="{StaticResource CustomSliderStyle}" Foreground="{DynamicResource CyanBrush}" MouseDown="PlayPositionSlider_MouseDown" MouseUp="PlayPositionSlider_MouseUp" ValueChanged="PlayPositionSlider_ValueChanged"/>
+                                    <Slider x:Name="PlayPositionSlider" Margin="10,0,10,0" Value="0" Maximum="1" Grid.Column="1" Style="{StaticResource CustomSliderStyle}" Foreground="{DynamicResource CyanBrush}" ValueChanged="PlayPositionSlider_ValueChanged" PreviewMouseDown="PlayPositionSlider_PreviewMouseDown" PreviewMouseUp="PlayPositionSlider_PreviewMouseUp"/>
                                     <TextBox x:Name="SoundFileLengthText" Text="00:00" DockPanel.Dock="Right" Grid.Column="2" HorizontalAlignment="Center"/>
                                 </Grid>
                             </StackPanel>

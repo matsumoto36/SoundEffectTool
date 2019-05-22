@@ -83,6 +83,8 @@ namespace SoundEffectToolGUI {
 			CompositionTarget.Rendering += UpdateRendering;
 			D3DImage.IsFrontBufferAvailableChanged += D3DImage_IsFrontBufferAvailableChanged;
 
+			// 描画対象に設定
+			var b = _soundEffectToolVM.SetWaveData(_windowName, SoundKey);
 		}
 
 		private void Image_SizeChanged(object sender, SizeChangedEventArgs e) {
@@ -142,12 +144,13 @@ namespace SoundEffectToolGUI {
 			Volume = (float)e.NewValue;
 		}
 
-		private void PlayPositionSlider_MouseDown(object sender, MouseButtonEventArgs e) {
+		private void PlayPositionSlider_PreviewMouseDown(object sender, MouseButtonEventArgs e) {
 			_playerPositionChanging = true;
 		}
 
-		private void PlayPositionSlider_MouseUp(object sender, MouseButtonEventArgs e) {
+		private void PlayPositionSlider_PreviewMouseUp(object sender, MouseButtonEventArgs e) {
 			_playerPositionChanging = false;
+			PlayRatio = (float)PlayPositionSlider.Value;
 			if(_soundEffectToolVM.IsPlay()) {
 				// 再生位置を変更して再生
 				_soundEffectToolVM.PlayMainSoundAtPosition(PlayRatio * _soundFileLength);
@@ -155,7 +158,7 @@ namespace SoundEffectToolGUI {
 		}
 
 		private void PlayPositionSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {
-			PlayRatio = (float)PlayPositionSlider.Value;
+			//PlayRatio = (float)PlayPositionSlider.Value;
 			PlayPositionText.Text = ToTime(PlayRatio * _soundFileLength);
 		}
 		#endregion
@@ -211,6 +214,18 @@ namespace SoundEffectToolGUI {
 				}
 				catch { /* キャンセルされたときは握りつぶす */ }
 
+			};
+
+			// 再生位置を更新
+			_soundEffectToolVM.OnAudioIsPlayChanged += isPlay => {
+				// 別スレッドからも呼ばれるため
+				try {
+					Dispatcher.Invoke(() => {
+						if(PlayRatio == 1.0f)
+							PlayPositionSlider.Value = PlayRatio = 0.0f;
+					});
+				}
+				catch { /* キャンセルされたときは握りつぶす */ }
 			};
 
 			// 音量が変化したときにアイコンを変更
