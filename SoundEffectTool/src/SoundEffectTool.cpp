@@ -46,7 +46,7 @@ namespace SoundEffectTool {
 		if (!audioData) return false;
 
 		// 情報を取得して投げる
-		renderer->SetAndSplitWaveData(audioData->GetWave(), audioData->GetLength(), audioData->GetChannelCount());
+		renderer->SetAudioData(audioData);
 
 		return true;
 	}

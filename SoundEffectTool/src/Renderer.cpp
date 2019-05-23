@@ -51,71 +51,46 @@ namespace SoundEffectTool {
 	}
 
 	void Renderer::SetAudioData(const shared_ptr<AudioData> audioData) {
-		//const unique_ptr<uint8_t[]>& waveData, UINT32 length, int channels
+
+		return;
 		// 参照
 		_audioData = audioData;
 
-		// デフォルトの設定
-		//SetRenderingData(1024, 100, 0, length / channels);
-		SetRenderingData(1024, 100, 0, 2048);
+		// デフォルトの設定で描画データ準備
+		SetRenderingData(256, 100, 0, 256);
 	}
 
-	void Renderer::SetRenderingData(int waveWidth, int waveHeight, UINT32 start, UINT32 end) {
+	void Renderer::SetRenderingData(uint32_t waveWidth, uint32_t waveHeight, uint32_t waveStart, uint32_t waveLength) {
+
+		return;
 
 		_waveDrawingData.clear();
-		_waveDrawingData.resize(_wavePerChannel.size());
+		auto channlCount = _audioData->GetChannelCount();
+		_waveDrawingData.resize(channlCount);
+
+		// サイズを確保
+		for (size_t i = 0; i < channlCount; i++) {
+			_waveDrawingData[i].clear();
+			_waveDrawingData[i].resize(waveWidth);
+		};
+
 		_waveWidth = waveWidth;
 		_waveHeight = waveHeight;
-		_waveLength = end - start;
-
-
-		_wavePerChannel.clear();
-		_wavePerChannel.resize(channels);
-
-		_waveLength = length;
-
-		// チャンネルごとの位置格納用
-		int* currents = new int[channels];
-
-		for (size_t i = 0; i < (size_t)channels; i++) {
-			// 割り切れるはず
-			_wavePerChannel[i] = make_unique<uint8_t[]>(length / channels);
-			currents[i] = 0;
-		}
-
-		UINT32 position = 0;
-		auto finished = false;
-		_waveMax = 255;
-
-		// 波形をチャンネルごとに分けてコピー
-		while (!finished) {
-			for (size_t i = 0; i < _wavePerChannel.size(); i++) {
-
-				auto wave = waveData[position];
-				//if (wave > _waveMax) _waveMax = wave;
-
-				// 比率でコピー
-				_wavePerChannel[i][currents[i]++] = wave;
-
-				if (length < ++position) {
-					finished = true;
-					break;
-				}
-			}
-		}
-
-		delete[] currents;
-
 		
-		for (size_t i = 0; i < _waveDrawingData.size(); i++) {
+		if (waveWidth == 0 || waveHeight == 0) return;
 
-			//_waveDrawingData[i] = make_unique<uint8_t[]>(waveWidth);
-			_waveDrawingData[i].resize(waveWidth);
+		_waveMax = 255;
+		auto&& waveData = _audioData->GetWave();
+		auto&& l = _audioData->GetLength();
+		auto start = waveStart * channlCount;
+		auto delta = (float)waveLength / waveWidth * channlCount;
+		for (size_t i = 0; i < waveWidth; i++) {
 
-			for (size_t j = 0; j < waveWidth; j++) {
-				size_t position = start + (float)j / waveWidth * _waveLength;
-				auto sample = (float)_wavePerChannel[i][position] / _waveMax * waveHeight;
-				_waveDrawingData[i][j] = sample;
+			auto base = start + (uint32_t)(delta * i);
+			for (size_t j = 0; j < channlCount; j++) {
+				// 高さを直してコピー
+				auto sample = (float)waveData[base + j] / _waveMax * waveHeight;
+				_waveDrawingData[j][i] = sample;
 			}
 		}
 	}
@@ -128,10 +103,12 @@ namespace SoundEffectTool {
 
 	void Renderer::DrawWave() const {
 
+
 		//画面を消す
 		ClearDrawScreen();
+		ScreenFlip();
+		return;
 
-		if (_waveLength <= 0) return;
 
 		auto waveColor = GetColor(0, 0, 255);
 		auto margin = 20;
@@ -139,11 +116,11 @@ namespace SoundEffectTool {
 		auto y = 0;
 		for (auto&& channel : _waveDrawingData) {
 			
-			auto prev = channel[0] - 128;
+			auto prev = channel[0];
 			auto x = 0;
 
 			for (size_t i = 1; i < _waveWidth; i++) {
-				auto s = channel[i] - 128;
+				auto s = channel[i];
 				DrawLine(x + i - 1, y + prev, x + i, y + s, waveColor);
 				prev = s;
 			}
