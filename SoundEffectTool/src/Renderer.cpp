@@ -50,14 +50,28 @@ namespace SoundEffectTool {
 		return GetUseDirect3D9BackBufferSurface();
 	}
 
-	void Renderer::CalcWaveData(const shared_ptr<AudioData> audioData) {
+	void Renderer::SetAudioData(const shared_ptr<AudioData> audioData) {
 		//const unique_ptr<uint8_t[]>& waveData, UINT32 length, int channels
 		// 参照
 		_audioData = audioData;
 
+		// デフォルトの設定
+		//SetRenderingData(1024, 100, 0, length / channels);
+		SetRenderingData(1024, 100, 0, 2048);
+	}
+
+	void Renderer::SetRenderingData(int waveWidth, int waveHeight, UINT32 start, UINT32 end) {
+
+		_waveDrawingData.clear();
+		_waveDrawingData.resize(_wavePerChannel.size());
+		_waveWidth = waveWidth;
+		_waveHeight = waveHeight;
+		_waveLength = end - start;
+
+
 		_wavePerChannel.clear();
 		_wavePerChannel.resize(channels);
-		
+
 		_waveLength = length;
 
 		// チャンネルごとの位置格納用
@@ -76,7 +90,7 @@ namespace SoundEffectTool {
 		// 波形をチャンネルごとに分けてコピー
 		while (!finished) {
 			for (size_t i = 0; i < _wavePerChannel.size(); i++) {
-				
+
 				auto wave = waveData[position];
 				//if (wave > _waveMax) _waveMax = wave;
 
@@ -92,18 +106,6 @@ namespace SoundEffectTool {
 
 		delete[] currents;
 
-		// デフォルトの設定
-		//SetRenderingData(1024, 100, 0, length / channels);
-		SetRenderingData(1024, 100, 0, 2048);
-	}
-
-	void Renderer::SetRenderingData(int waveWidth, int waveHeight, UINT32 start, UINT32 end) {
-
-		_waveDrawingData.clear();
-		_waveDrawingData.resize(_wavePerChannel.size());
-		_waveWidth = waveWidth;
-		_waveHeight = waveHeight;
-		_waveLength = end - start;
 		
 		for (size_t i = 0; i < _waveDrawingData.size(); i++) {
 

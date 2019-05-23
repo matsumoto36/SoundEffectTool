@@ -42,7 +42,7 @@ namespace SoundEffectTool {
 		const void* GetBackBuffer() const;
 
 		// 波形の情報を変換してセットする
-		void CalcWaveData(const shared_ptr<AudioData> audioData);
+		void SetAudioData(const shared_ptr<AudioData> audioData);
 
 		// 波形の長さと位置を変更
 		void SetRenderingData(int waveWidth, int waveHeight, UINT32 start, UINT32 end);
