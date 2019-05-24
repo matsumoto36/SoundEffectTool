@@ -76,8 +76,6 @@ namespace SoundEffectTool {
 		_waveWidth = waveWidth;
 		_waveHeight = waveHeight;
 		
-		return;
-
 		if (waveWidth == 0 || waveHeight == 0) return;
 
 		auto start = sampleStart * channlCount;

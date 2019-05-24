@@ -40,8 +40,6 @@ namespace SoundEffectToolGUI {
 		private BitmapImage _volumeButtonImage;
 		private BitmapImage _volumeMuteButtonImage;
 
-		private bool _isLoadedImage;
-
 		private float _volume;
 		public float Volume {
 			get { return _volume; }
@@ -56,10 +54,9 @@ namespace SoundEffectToolGUI {
 
 		public MainWindow() {
 
-			_soundEffectToolVM = new SoundEffectToolVM();
-
 			InitializeComponent();
 
+			_soundEffectToolVM = new SoundEffectToolVM();
 			DataContext = _soundEffectToolVM;
 
 			// 画像の読み込み
@@ -70,28 +67,16 @@ namespace SoundEffectToolGUI {
 
 			// タイマー準備
 			SetupTimer();
+
+	
+
 		}
 
 		#region Events
 
 		private void Image_Loaded(object sender, RoutedEventArgs e) {
-			if(_isLoadedImage) return;
-			_isLoadedImage = true;
-
-			// ウィンドウハンドルを生成
-			var hwndSrc = new HwndSource(0, 0, 0, 0, 0, "DxLib", IntPtr.Zero);
-
-			_soundEffectToolVM.CreateDxView(hwndSrc.Handle, _windowName, (int)Image.Width, (int)Image.Height);
-
-			D3DImage = new D3DImage();
-			Image.Source = D3DImage;
-
-			// 描画の更新
-			CompositionTarget.Rendering += UpdateRendering;
-			D3DImage.IsFrontBufferAvailableChanged += D3DImage_IsFrontBufferAvailableChanged;
-
-			// 描画対象に設定
-			var b = _soundEffectToolVM.SetWaveData(_windowName, SoundKey);
+			// レンダリング準備
+			SetupRendering();
 		}
 
 		private void Image_SizeChanged(object sender, SizeChangedEventArgs e) {
@@ -187,6 +172,27 @@ namespace SoundEffectToolGUI {
 			LoadImage(ref _pauseButtonImage, "\\Resource\\Texture\\Pause.png");
 			LoadImage(ref _volumeButtonImage, "\\Resource\\Texture\\Volume.png");
 			LoadImage(ref _volumeMuteButtonImage, "\\Resource\\Texture\\VolumeMute.png");
+		}
+
+		/// <summary>
+		/// レンダリングシステムを準備する
+		/// </summary>
+		private void SetupRendering() {
+
+			// ウィンドウハンドルを生成
+			var hwndSrc = new HwndSource(0, 0, 0, 0, 0, "DxLib", IntPtr.Zero);
+
+			_soundEffectToolVM.CreateDxView(hwndSrc.Handle, _windowName, (int)Image.Width, (int)Image.Height);
+
+			D3DImage = new D3DImage();
+			Image.Source = D3DImage;
+
+			// 描画の更新
+			CompositionTarget.Rendering += UpdateRendering;
+			D3DImage.IsFrontBufferAvailableChanged += D3DImage_IsFrontBufferAvailableChanged;
+
+			// 描画対象に設定
+			var b = _soundEffectToolVM.SetWaveData(_windowName, SoundKey);
 		}
 
 		/// <summary>
@@ -311,15 +317,15 @@ namespace SoundEffectToolGUI {
 				var backBuffer = _soundEffectToolVM.GetBackBuffer(_windowName);
 				if(backBuffer != IntPtr.Zero) {
 
-					//D3DImage.Lock();
+					D3DImage.Lock();
 
-					//// バックバッファの設定
-					//D3DImage.SetBackBuffer(D3DResourceType.IDirect3DSurface9, backBuffer);
-					//// 描画
-					//_soundEffectToolVM.Draw(_windowName);
-					//D3DImage.AddDirtyRect(new Int32Rect(0, 0, D3DImage.PixelWidth, D3DImage.PixelHeight));
+					// バックバッファの設定
+					D3DImage.SetBackBuffer(D3DResourceType.IDirect3DSurface9, backBuffer);
+					// 描画
+					_soundEffectToolVM.Draw(_windowName);
+					D3DImage.AddDirtyRect(new Int32Rect(0, 0, D3DImage.PixelWidth, D3DImage.PixelHeight));
 
-					//D3DImage.Unlock();
+					D3DImage.Unlock();
 
 					_lastRender = args.RenderingTime;
 				}
