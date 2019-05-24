@@ -305,22 +305,21 @@ namespace SoundEffectToolGUI {
 		/// <param name="e"></param>
 		private void UpdateRendering(object sender, EventArgs e) {
 
-
 			var args = (RenderingEventArgs)e;
 			if(D3DImage.IsFrontBufferAvailable && _lastRender != args.RenderingTime) {
 
 				var backBuffer = _soundEffectToolVM.GetBackBuffer(_windowName);
 				if(backBuffer != IntPtr.Zero) {
 
-					D3DImage.Lock();
+					//D3DImage.Lock();
 
-					// バックバッファの設定
-					D3DImage.SetBackBuffer(D3DResourceType.IDirect3DSurface9, backBuffer);
-					// 描画
-					_soundEffectToolVM.Draw(_windowName);
-					D3DImage.AddDirtyRect(new Int32Rect(0, 0, D3DImage.PixelWidth, D3DImage.PixelHeight));
+					//// バックバッファの設定
+					//D3DImage.SetBackBuffer(D3DResourceType.IDirect3DSurface9, backBuffer);
+					//// 描画
+					//_soundEffectToolVM.Draw(_windowName);
+					//D3DImage.AddDirtyRect(new Int32Rect(0, 0, D3DImage.PixelWidth, D3DImage.PixelHeight));
 
-					D3DImage.Unlock();
+					//D3DImage.Unlock();
 
 					_lastRender = args.RenderingTime;
 				}

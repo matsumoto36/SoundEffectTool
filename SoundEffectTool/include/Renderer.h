@@ -44,7 +44,7 @@ namespace SoundEffectTool {
 		void SetAudioData(const shared_ptr<AudioData> audioData);
 
 		// 波形の長さと位置を変更(start, lengthはチャンネルごとの長さ)
-		void SetRenderingData(uint32_t waveWidth, uint32_t waveHeight, uint32_t waveStart, uint32_t waveLength);
+		void SetRenderingData(uint32_t waveWidth, uint32_t waveHeight, uint32_t sampleStart, uint32_t sampleLength);
 
 		// 描画のサイズを変更する
 		void ChangeDrawSize(int width, int height);

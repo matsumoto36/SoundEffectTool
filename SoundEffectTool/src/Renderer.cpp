@@ -56,10 +56,10 @@ namespace SoundEffectTool {
 		_audioData = audioData;
 
 		// デフォルトの設定で描画データ準備
-		SetRenderingData(128, 100, 0, 128);
+		SetRenderingData(128, 50, 0, 128);
 	}
 
-	void Renderer::SetRenderingData(uint32_t waveWidth, uint32_t waveHeight, uint32_t waveStart, uint32_t waveLength) {
+	void Renderer::SetRenderingData(uint32_t waveWidth, uint32_t waveHeight, uint32_t sampleStart, uint32_t sampleLength) {
 
 		if (!_audioData) return;
 
@@ -68,7 +68,7 @@ namespace SoundEffectTool {
 		_waveDrawingData.resize(channlCount);
 
 		// サイズを確保
-		for (size_t i = 0; i < channlCount; i++) {
+		for (size_t i = 0; i < (size_t)channlCount; i++) {
 			_waveDrawingData[i].clear();
 			_waveDrawingData[i].resize(waveWidth);
 		};
@@ -76,30 +76,31 @@ namespace SoundEffectTool {
 		_waveWidth = waveWidth;
 		_waveHeight = waveHeight;
 		
+		return;
+
 		if (waveWidth == 0 || waveHeight == 0) return;
 
-		auto&& waveData = _audioData->GetWaveData();
-		auto format = _audioData->GetFormat();
-		auto byteOrder = format.wBitsPerSample / 8;
-		auto start = waveStart * channlCount;
-		auto delta = (float)waveLength / waveWidth * channlCount * byteOrder;
+		auto start = sampleStart * channlCount;
+		auto length = sampleLength * channlCount;
+		auto delta = (float)sampleLength / waveWidth * channlCount;
+		auto sampleData = new int[length];
+		_audioData->ReadSamples(start, length, &sampleData);
+
 		auto dump = vector<uint32_t>();
 		for (size_t i = 0; i < waveWidth; i++) {
 
 			auto base = start + (uint32_t)(delta * i);
 			dump.push_back(base);
-			for (size_t j = 0; j < channlCount; j++) {
-				//データをサンプルに変換
-				int sample = 0;
-				for (size_t k = 0; k < byteOrder; k++) {
-
-				}
+			for (size_t j = 0; j < (size_t)channlCount; j++) {
+				auto sample = sampleData[base + j];
 
 				// 高さを直してコピー
-				auto drawData = (float)sample /  * waveHeight;
-				_waveDrawingData[j][i] = drawData;
+				auto drawData = (float)sample / 128 * waveHeight;
+				_waveDrawingData[j][i] = (int)drawData;
 			}
 		}
+
+		delete[] sampleData;
 	}
 
 	void Renderer::ChangeDrawSize(int width, int height) {
@@ -116,7 +117,7 @@ namespace SoundEffectTool {
 		auto waveColor = GetColor(0, 0, 255);
 		auto margin = 20;
 
-		auto y = 0;
+		auto y = _waveHeight;
 		for (auto&& channel : _waveDrawingData) {
 			
 			auto prev = channel[0];

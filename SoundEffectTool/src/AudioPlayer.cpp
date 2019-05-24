@@ -45,7 +45,7 @@ namespace SoundEffectTool {
 		
 		_position = 0;
 		// •b‚É•ÏŠ·
-		_length = (float)audioData->GetLength() / _impl->_samplesPerSec;
+		_length = (float)audioData->GetSampleLength() / _impl->_samplesPerSec;
 
 		return true;
 	}

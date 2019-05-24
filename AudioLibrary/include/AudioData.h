@@ -49,7 +49,7 @@ namespace AudioLibrary {
 		}
 
 		// 波形内のサンプルを読み取る
-		bool ReadSamples(uint32_t start, uint32_t length, char** outSamples) const;
+		bool ReadSamples(uint32_t start, uint32_t length, int** outSamples) const;
 
 		// チャンネルの数を返す
 		const int GetChannelCount() const;

@@ -20,7 +20,7 @@ namespace AudioLibrary {
 		_impl(make_unique<Impl>(format, buffer)),
 		_wave(move(wave)),
 		_dataLength(buffer.AudioBytes),
-		_sampleLength(buffer.AudioBytes / format.wBitsPerSample / 8) { }
+		_sampleLength(buffer.AudioBytes / format.nBlockAlign) { }
 
 	AudioData::~AudioData() {
 		_wave.reset();
@@ -34,7 +34,7 @@ namespace AudioLibrary {
 		return _impl->_buffer.pAudioData;
 	}
 
-	bool AudioData::ReadSamples(uint32_t start, uint32_t length, char** outSamples) const {
+	bool AudioData::ReadSamples(uint32_t start, uint32_t length, int** outSamples) const {
 		if (length == 0) return false;
 		if (start + length > _sampleLength) return false;
 
@@ -45,21 +45,22 @@ namespace AudioLibrary {
 		for (size_t i = 0; i < length; i++) {
 
 			char sample = 0;
-			
+			auto position = byteStart + i;
+
 			if (byteCount == 1) {
 				// 1byte‚Ìê‡‚Í0~255‚Ì”ÍˆÍ‚Å128‚ª’†S(U•‚È‚µ)
-				sample = (char)waveData[byteStart];
+				sample = (char)waveData[position];
 			}
 			else if (byteCount == 2) {
 				// 2byte‚Ìê‡‚Í-32768`32767‚Ì”ÍˆÍ‚Å0‚ª’†S(U•‚È‚µ)
 
 				// windows‚Å‚ÍƒŠƒgƒ‹ƒGƒ“ƒfƒBƒAƒ“‚È‚Ì‚ÅA‹t‚©‚ç’Ç‰Á‚µ‚Ä‚¢‚­
-				uint16_t temp = waveData[byteStart + 1];
+				short temp = waveData[position + 1];
 				temp = temp << 8;
-				temp += waveData[byteStart];
+				temp |= waveData[position];
 
 				// char‚Ì”ÍˆÍ‚É¬Œ^‚·‚é
-				sample = (char)(temp / 256);
+				sample = (char)((float)temp / 256);
 			}
 
 			(*outSamples)[i] = sample;

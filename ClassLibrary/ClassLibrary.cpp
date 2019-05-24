@@ -60,7 +60,8 @@ namespace SoundEffectTool {
 
 	const IntPtr SoundEffectToolVM::GetBackBuffer(String^ windowName) {
 		auto&& renderer = _manager->GetRenderer(ToStdString(windowName));
-		if (!renderer) return IntPtr(nullptr);
+		if (!renderer) 
+			return IntPtr(nullptr);
 		return IntPtr(const_cast<void*>(renderer->GetBackBuffer()));
 	}
 
@@ -74,7 +75,8 @@ namespace SoundEffectTool {
 
 	bool SoundEffectToolVM::Draw(String^ windowName) {
 		auto&& renderer = _manager->GetRenderer(ToStdString(windowName));
-		if (!renderer) return false;
+		if (!renderer) 
+			return false;
 
 		renderer->DrawWave();
 		return true;
