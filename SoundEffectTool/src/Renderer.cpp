@@ -35,7 +35,7 @@ namespace SoundEffectTool {
 		SetWindowSize(width, height);
 
 		// 背景色の設定
-		SetBackgroundColor(32, 32, 32);
+		SetBackgroundColor(220, 220, 220);
 	}
 
 	void Renderer::Finalize() {
@@ -52,17 +52,16 @@ namespace SoundEffectTool {
 
 	void Renderer::SetAudioData(const shared_ptr<AudioData> audioData) {
 
-		return;
 		// 参照
 		_audioData = audioData;
 
 		// デフォルトの設定で描画データ準備
-		SetRenderingData(256, 100, 0, 256);
+		SetRenderingData(128, 100, 0, 128);
 	}
 
 	void Renderer::SetRenderingData(uint32_t waveWidth, uint32_t waveHeight, uint32_t waveStart, uint32_t waveLength) {
 
-		return;
+		if (!_audioData) return;
 
 		_waveDrawingData.clear();
 		auto channlCount = _audioData->GetChannelCount();
@@ -79,18 +78,26 @@ namespace SoundEffectTool {
 		
 		if (waveWidth == 0 || waveHeight == 0) return;
 
-		_waveMax = 255;
-		auto&& waveData = _audioData->GetWave();
-		auto&& l = _audioData->GetLength();
+		auto&& waveData = _audioData->GetWaveData();
+		auto format = _audioData->GetFormat();
+		auto byteOrder = format.wBitsPerSample / 8;
 		auto start = waveStart * channlCount;
-		auto delta = (float)waveLength / waveWidth * channlCount;
+		auto delta = (float)waveLength / waveWidth * channlCount * byteOrder;
+		auto dump = vector<uint32_t>();
 		for (size_t i = 0; i < waveWidth; i++) {
 
 			auto base = start + (uint32_t)(delta * i);
+			dump.push_back(base);
 			for (size_t j = 0; j < channlCount; j++) {
+				//データをサンプルに変換
+				int sample = 0;
+				for (size_t k = 0; k < byteOrder; k++) {
+
+				}
+
 				// 高さを直してコピー
-				auto sample = (float)waveData[base + j] / _waveMax * waveHeight;
-				_waveDrawingData[j][i] = sample;
+				auto drawData = (float)sample /  * waveHeight;
+				_waveDrawingData[j][i] = drawData;
 			}
 		}
 	}
@@ -103,12 +110,8 @@ namespace SoundEffectTool {
 
 	void Renderer::DrawWave() const {
 
-
 		//画面を消す
 		ClearDrawScreen();
-		ScreenFlip();
-		return;
-
 
 		auto waveColor = GetColor(0, 0, 255);
 		auto margin = 20;

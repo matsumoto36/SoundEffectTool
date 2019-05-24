@@ -20,8 +20,8 @@ namespace AudioLibrary {
 	private:
 		AudioPlayerStatus _status;		// 再生状態
 		float _volume;					// 現在の音量
-		UINT64 _position;				// 再生位置(サンプル数)
-		UINT32 _seekData;				// 再生位置(バイト数)
+		uint64_t _position;				// 再生位置(サンプル数)
+		uint64_t _seekData;				// 再生位置(バイト数)
 
 		float _targetTime;				// フェードを行う時間
 		float _fading = 0;				// フェードの経過時間

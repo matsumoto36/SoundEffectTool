@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "../include/AudioData.h"
-
+#include <math.h>
 
 namespace AudioLibrary {
 
@@ -19,14 +19,53 @@ namespace AudioLibrary {
 	AudioData::AudioData(const WAVEFORMATEX& format, unique_ptr<uint8_t[]> wave, const XAUDIO2_BUFFER& buffer) :
 		_impl(make_unique<Impl>(format, buffer)),
 		_wave(move(wave)),
-		_length(buffer.AudioBytes / format.nBlockAlign) { }
+		_dataLength(buffer.AudioBytes),
+		_sampleLength(buffer.AudioBytes / format.wBitsPerSample / 8) { }
 
 	AudioData::~AudioData() {
 		_wave.reset();
 	}
 
-	const unique_ptr<uint8_t[]>& AudioData::GetWave() const {
+	const unique_ptr<uint8_t[]>& AudioData::GetWaveFile() const {
 		return _wave;
+	}
+
+	const uint8_t* AudioData::GetWaveData() const {
+		return _impl->_buffer.pAudioData;
+	}
+
+	bool AudioData::ReadSamples(uint32_t start, uint32_t length, char** outSamples) const {
+		if (length == 0) return false;
+		if (start + length > _sampleLength) return false;
+
+		auto byteCount = _impl->_format.wBitsPerSample / 8U;
+		auto byteStart = start * byteCount;
+		auto waveData = _impl->_buffer.pAudioData;
+
+		for (size_t i = 0; i < length; i++) {
+
+			char sample = 0;
+			
+			if (byteCount == 1) {
+				// 1byte‚Ìê‡‚Í0~255‚Ì”ÍˆÍ‚Å128‚ª’†S(U•‚È‚µ)
+				sample = (char)waveData[byteStart];
+			}
+			else if (byteCount == 2) {
+				// 2byte‚Ìê‡‚Í-32768`32767‚Ì”ÍˆÍ‚Å0‚ª’†S(U•‚È‚µ)
+
+				// windows‚Å‚ÍƒŠƒgƒ‹ƒGƒ“ƒfƒBƒAƒ“‚È‚Ì‚ÅA‹t‚©‚ç’Ç‰Á‚µ‚Ä‚¢‚­
+				uint16_t temp = waveData[byteStart + 1];
+				temp = temp << 8;
+				temp += waveData[byteStart];
+
+				// char‚Ì”ÍˆÍ‚É¬Œ^‚·‚é
+				sample = (char)(temp / 256);
+			}
+
+			(*outSamples)[i] = sample;
+		}
+
+		return true;
 	}
 
 	const int AudioData::GetChannelCount() const {

@@ -91,7 +91,7 @@ namespace SoundEffectToolGUI {
 			D3DImage.IsFrontBufferAvailableChanged += D3DImage_IsFrontBufferAvailableChanged;
 
 			// 描画対象に設定
-			//var b = _soundEffectToolVM.SetWaveData(_windowName, SoundKey);
+			var b = _soundEffectToolVM.SetWaveData(_windowName, SoundKey);
 		}
 
 		private void Image_SizeChanged(object sender, SizeChangedEventArgs e) {

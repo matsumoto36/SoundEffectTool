@@ -22,7 +22,6 @@ namespace SoundEffectTool {
 		uint32_t _waveLength = 0;
 		uint32_t _waveWidth = 1024;
 		uint32_t _waveHeight = 100;
-		uint8_t _waveMax;
 		shared_ptr<AudioData> _audioData = nullptr;
 		vector<vector<int>> _waveDrawingData;
 

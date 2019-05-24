@@ -45,7 +45,7 @@ namespace AudioLibrary {
 		// XAudio2のコールバックをラップする
 		function<void()> OnXAudio2StreamEnd;
 		function<void()> OnXAudio2VoiceProcessingPassEnd;
-		function<void(UINT32)> OnXAudio2VoiceProcessingPassStart;
+		function<void(uint32_t)> OnXAudio2VoiceProcessingPassStart;
 		function<void(void*)> OnXAudio2BufferEnd;
 		function<void(void*)> OnXAudio2BufferStart;
 		function<void(void*)> OnXAudio2LoopEnd;
@@ -68,7 +68,7 @@ namespace AudioLibrary {
 		if (!Player._impl->OnXAudio2VoiceProcessingPassEnd) return;
 		Player._impl->OnXAudio2VoiceProcessingPassEnd();
 	}
-	void STDMETHODCALLTYPE AudioPlayer::VoiceCallback::OnVoiceProcessingPassStart(UINT32 bytesRequired) {
+	void STDMETHODCALLTYPE AudioPlayer::VoiceCallback::OnVoiceProcessingPassStart(uint32_t bytesRequired) {
 		if (!Player._impl->OnXAudio2VoiceProcessingPassStart) return;
 		Player._impl->OnXAudio2VoiceProcessingPassStart(bytesRequired);
 	}
@@ -97,7 +97,7 @@ namespace AudioLibrary {
 		_volume(volume) { 
 	
 		// XAudio2のコールバックの動作を設定
-		_impl->OnXAudio2VoiceProcessingPassStart = [&](UINT32 requredBytes) {
+		_impl->OnXAudio2VoiceProcessingPassStart = [&](uint32_t requredBytes) {
 
 			//if (FAILED(CheckValidData())) return;
 
@@ -188,8 +188,8 @@ namespace AudioLibrary {
 
 	}
 
-	HRESULT AudioPlayer::Play(UINT32 samples) {
-
+	HRESULT AudioPlayer::Play(uint32_t samples) {
+		// byte単位からサンプル単位に直すべき
 		Stop();
 
 		auto hr = S_OK;
@@ -312,7 +312,7 @@ namespace AudioLibrary {
 		return S_OK;
 	}
 
-	void AudioPlayer::AddBuffer(UINT32 requredBytes) {
+	void AudioPlayer::AddBuffer(uint32_t requredBytes) {
 
 		auto&& p = _impl->_audioData->GetBuffer().pAudioData;
 		XAUDIO2_BUFFER buf = { 0 };
@@ -331,7 +331,7 @@ namespace AudioLibrary {
 				Stop();
 				return;
 			}
-			buf.AudioBytes = bytes;
+			buf.AudioBytes = (uint32_t)bytes;
 			// ストリーミング再生終了フラグ
 			buf.Flags = XAUDIO2_END_OF_STREAM;
 			_seekData += bytes;
