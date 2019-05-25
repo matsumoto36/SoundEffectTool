@@ -6,7 +6,7 @@
 namespace AudioLibrary {
 
 
-	HRESULT AudioLoader::LoadWaveFile(const IXAudio2& xAudio2, const wstring& filePath, shared_ptr<AudioData>& retAudioData) {
+	HRESULT AudioLoader::LoadWaveFile(const IXAudio2& xAudio2, const wstring& filePath, shared_ptr<AudioData>& outAudioData) {
 
 		OutputDebugString("LoadWaveFile\n");
 
@@ -44,7 +44,7 @@ namespace AudioLibrary {
 		// •Ô‹p
 		auto ex = make_unique<WAVEFORMATEX>();
 		auto&& a = *waveData.wfx;
-		retAudioData = move(make_shared<AudioData>(a, move(waveFile), buffer));
+		outAudioData = move(make_shared<AudioData>(a, move(waveFile), buffer));
 
 		return hr;
 	}

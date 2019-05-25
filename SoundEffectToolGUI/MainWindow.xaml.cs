@@ -23,8 +23,8 @@ namespace SoundEffectToolGUI {
 	/// </summary>
 	public partial class MainWindow : Window {
 
-		const string SoundKey = "MainSound";						// 音声ファイルにアクセスするためのキー
-
+		const string SoundKey = "MainSound";							// 音声ファイルにアクセスするためのキー
+		const string SoundFilePath = "Resource/Audio/MusicSurround.wav";	// 音声ファイルのパス
 		private SoundEffectToolVM _soundEffectToolVM;
 		private string _windowName = "DxLib";
 		private TimeSpan _lastRender;
@@ -67,9 +67,6 @@ namespace SoundEffectToolGUI {
 
 			// タイマー準備
 			SetupTimer();
-
-	
-
 		}
 
 		#region Events
@@ -150,7 +147,6 @@ namespace SoundEffectToolGUI {
 		}
 
 		private void PlayPositionSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {
-			//PlayRatio = (float)PlayPositionSlider.Value;
 			PlayPositionText.Text = ToTime(PlayRatio * _soundFileLength);
 		}
 		#endregion
@@ -201,7 +197,7 @@ namespace SoundEffectToolGUI {
 		private void SetupAudio() {
 
 			// 音声ファイルのロード
-			_soundEffectToolVM.LoadSound("Resource/Audio/MusicSurround.wav", SoundKey);
+			_soundEffectToolVM.LoadSound(SoundFilePath, SoundKey);
 			// メインの音にセット
 			_soundEffectToolVM.SetMainSound(SoundKey);
 

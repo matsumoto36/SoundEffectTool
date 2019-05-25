@@ -20,7 +20,7 @@ namespace AudioLibrary {
 	public:
 		
 		// ‰¹ºƒtƒ@ƒCƒ‹‚ğ“Ç‚İ‚Ş
-		static HRESULT LoadWaveFile(const IXAudio2& xAudio2, const wstring& filePath, shared_ptr<AudioData>& retAudioData);
+		static HRESULT LoadWaveFile(const IXAudio2& xAudio2, const wstring& filePath, shared_ptr<AudioData>& outAudioData);
 
 	private:
 

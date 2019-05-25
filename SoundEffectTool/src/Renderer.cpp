@@ -56,49 +56,90 @@ namespace SoundEffectTool {
 		_audioData = audioData;
 
 		// デフォルトの設定で描画データ準備
-		SetRenderingData(128, 50, 0, 128);
+		CalcRenderingData(512, 50, 0, _audioData->GetSampleLength() / _audioData->GetChannelCount());
+		//CalcRenderingData(512, 50, 0, 4096);
 	}
 
-	void Renderer::SetRenderingData(uint32_t waveWidth, uint32_t waveHeight, uint32_t sampleStart, uint32_t sampleLength) {
+	void Renderer::CalcRenderingData(uint32_t pixelWidth, uint32_t pixelHeight, uint32_t sampleStart, uint32_t sampleLength) {
 
 		if (!_audioData) return;
 
-		_waveDrawingData.clear();
 		auto channlCount = _audioData->GetChannelCount();
-		_waveDrawingData.resize(channlCount);
+		auto pointList = vector<vector<vector<int>>>();	// チャンネル・ピクセル位置ごとの点のリスト
+		_waveDrawingPoints.clear();
+		_waveDrawingPoints.resize(channlCount);
+		pointList.resize(channlCount);
 
-		// サイズを確保
-		for (size_t i = 0; i < (size_t)channlCount; i++) {
-			_waveDrawingData[i].clear();
-			_waveDrawingData[i].resize(waveWidth);
-		};
+		_waveWidth = pixelWidth;
+		_waveHeight = pixelHeight;
 
-		_waveWidth = waveWidth;
-		_waveHeight = waveHeight;
-		
-		if (waveWidth == 0 || waveHeight == 0) return;
+		if (pixelWidth == 0 || pixelHeight == 0) return;
 
 		auto start = sampleStart * channlCount;
 		auto length = sampleLength * channlCount;
-		auto delta = (float)sampleLength / waveWidth * channlCount;
+		auto maxHeight = 0;
+
+		// サンプルデータを取得
 		auto sampleData = new int[length];
 		_audioData->ReadSamples(start, length, &sampleData);
 
-		auto dump = vector<uint32_t>();
-		for (size_t i = 0; i < waveWidth; i++) {
+		// 最大値を求める
+		for (size_t i = 0; i < length; i++) {
+			auto sample = abs(sampleData[i]);
+			if (sample > maxHeight) {
+				maxHeight = sample;
+			}
+		}
 
-			auto base = start + (uint32_t)(delta * i);
-			dump.push_back(base);
+
+		// サイズを確保
+		for (size_t i = 0; i < (size_t)channlCount; i++) {
+			_waveDrawingPoints[i].clear();
+			pointList[i].resize(pixelWidth);
+		};
+
+		auto delta = (float)pixelWidth / sampleLength;
+		// ピクセル位置ごとの高さのリストに変換
+		for (size_t i = 0; i < sampleLength; i++) {
+			// 横のピクセル位置を計算
+			auto x = (size_t)(delta * i);
 			for (size_t j = 0; j < (size_t)channlCount; j++) {
-				auto sample = sampleData[base + j];
-
-				// 高さを直してコピー
-				auto drawData = (float)sample / 128 * waveHeight;
-				_waveDrawingData[j][i] = (int)drawData;
+				auto sample = sampleData[i * channlCount + j];
+				pointList[j][x].push_back(sample);
 			}
 		}
 
 		delete[] sampleData;
+
+		// 圧縮して追加する
+		for (size_t i = 0; i < pixelWidth; i++) {
+			for (size_t j = 0; j < (size_t)channlCount; j++) {
+				auto dataCount = pointList[j][i].size();
+				if (dataCount == 0U) continue;	// ない場合は追加しない
+				if (dataCount == 1U) {
+					// 高さを直して追加する
+					auto drawData = (float)pointList[j][i][0] / maxHeight * pixelHeight;
+					_waveDrawingPoints[j].push_back(PointInt(i, (int)drawData));
+				}
+				else {
+					// 最小と最大を取得
+					auto sampleMinMax = PointInt(pointList[j][i][0], pointList[j][i][0]);
+					for (size_t k = 1; k < dataCount; k++) {
+						auto p = pointList[j][i][k];
+						if (p < sampleMinMax.X) sampleMinMax.X = p;
+						if (p > sampleMinMax.Y) sampleMinMax.Y = p;
+					}
+
+					// 高さを直して追加する
+					auto drawData = (float)sampleMinMax.X / maxHeight * pixelHeight;
+					_waveDrawingPoints[j].push_back(PointInt(i, (int)drawData));
+					drawData = (float)sampleMinMax.Y / maxHeight * pixelHeight;
+					_waveDrawingPoints[j].push_back(PointInt(i, (int)drawData));
+				}
+			}
+
+		}
+		
 	}
 
 	void Renderer::ChangeDrawSize(int width, int height) {
@@ -113,21 +154,25 @@ namespace SoundEffectTool {
 		ClearDrawScreen();
 
 		auto waveColor = GetColor(0, 0, 255);
-		auto margin = 20;
+		auto zeroLineColor = GetColor(32, 32, 32);
+		auto margin = 50;
 
-		auto y = _waveHeight;
-		for (auto&& channel : _waveDrawingData) {
+		auto offsetY = _waveHeight;
+		for (auto&& channel : _waveDrawingPoints) {
 			
-			auto prev = channel[0];
-			auto x = 0;
+			// 波形の中心を引く
+			DrawLine(0, offsetY, _waveWidth, offsetY, zeroLineColor);
 
-			for (size_t i = 1; i < _waveWidth; i++) {
-				auto s = channel[i];
-				DrawLine(x + i - 1, y + prev, x + i, y + s, waveColor);
-				prev = s;
+			// 点のリストを描画する
+			auto offsetX = 0;
+			auto prevSample = channel[0];
+			for (size_t i = 1; i < channel.size(); i++) {
+				auto currentSample = channel[i];
+				DrawLine(offsetX + prevSample.X, offsetY + prevSample.Y, offsetX + currentSample.X, offsetY + currentSample.Y, waveColor);
+				prevSample = currentSample;
 			}
 
-			y += margin + _waveHeight;
+			offsetY += margin + _waveHeight;
 		}
 
 		ScreenFlip();

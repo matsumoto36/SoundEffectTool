@@ -44,12 +44,12 @@ namespace AudioLibrary {
 
 		for (size_t i = 0; i < length; i++) {
 
-			char sample = 0;
-			auto position = byteStart + i;
+			int sample = 0;
+			auto position = byteStart + i * byteCount;
 
 			if (byteCount == 1) {
 				// 1byte‚Ìê‡‚Í0~255‚Ì”ÍˆÍ‚Å128‚ª’†S(U•‚È‚µ)
-				sample = (char)waveData[position];
+				sample = waveData[position] - 128;
 			}
 			else if (byteCount == 2) {
 				// 2byte‚Ìê‡‚Í-32768`32767‚Ì”ÍˆÍ‚Å0‚ª’†S(U•‚È‚µ)
@@ -60,10 +60,12 @@ namespace AudioLibrary {
 				temp |= waveData[position];
 
 				// char‚Ì”ÍˆÍ‚É¬Œ^‚·‚é
-				sample = (char)((float)temp / 256);
+				//sample = (char)((float)temp / 256);
+				sample = temp;
 			}
 
-			(*outSamples)[i] = sample;
+			// •`‰æ—p‚É”½“]H
+			(*outSamples)[i] = sample * -1;
 		}
 
 		return true;
