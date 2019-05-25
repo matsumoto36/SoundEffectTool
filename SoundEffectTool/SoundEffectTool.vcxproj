@@ -170,6 +170,7 @@
     <ClInclude Include="include\AudioPlayer.h" />
     <ClInclude Include="include\AudioController.h" />
     <ClInclude Include="include\Renderer.h" />
+    <ClInclude Include="include\PointInt.h" />
     <ClInclude Include="src\resource.h" />
     <ClInclude Include="include\SoundEffectTool.h" />
     <ClInclude Include="include\SoundEffectToolDefine.h" />

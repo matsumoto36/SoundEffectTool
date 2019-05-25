@@ -76,11 +76,6 @@ namespace SoundEffectToolGUI {
 			SetupRendering();
 		}
 
-		private void Image_SizeChanged(object sender, SizeChangedEventArgs e) {
-			//描画のサイズも変更する
-			//_soundEffectToolVM.ChangeDrawSize(_windowName, (int)e.NewSize.Width, (int)e.NewSize.Height);
-		}
-
 		/// <summary>
 		/// フロントバッファの更新
 		/// </summary>
@@ -178,7 +173,7 @@ namespace SoundEffectToolGUI {
 			// ウィンドウハンドルを生成
 			var hwndSrc = new HwndSource(0, 0, 0, 0, 0, "DxLib", IntPtr.Zero);
 
-			_soundEffectToolVM.CreateDxView(hwndSrc.Handle, _windowName, (int)Image.Width, (int)Image.Height);
+			_soundEffectToolVM.CreateDxView(hwndSrc.Handle, _windowName, new Size(1920, 1080));
 
 			D3DImage = new D3DImage();
 			Image.Source = D3DImage;
@@ -188,7 +183,10 @@ namespace SoundEffectToolGUI {
 			D3DImage.IsFrontBufferAvailableChanged += D3DImage_IsFrontBufferAvailableChanged;
 
 			// 描画対象に設定
-			var b = _soundEffectToolVM.SetWaveData(_windowName, SoundKey);
+			_soundEffectToolVM.SetWaveData(_windowName, SoundKey);
+			var size = _soundEffectToolVM.GetDrawSize(_windowName);
+			Image.Width = size.Width;
+			Image.Height = size.Height;
 		}
 
 		/// <summary>
@@ -230,8 +228,19 @@ namespace SoundEffectToolGUI {
 				// 別スレッドからも呼ばれるため
 				try {
 					Dispatcher.Invoke(() => {
-						if(PlayRatio == 1.0f)
-							PlayPositionSlider.Value = PlayRatio = 0.0f;
+						if(isPlay)
+							PlayPositionSlider.Value = PlayRatio;
+					});
+				}
+				catch { /* キャンセルされたときは握りつぶす */ }
+			};
+
+			// 再生し終わったら戻す
+			_soundEffectToolVM.OnAudioPlayingEnd += () => {
+				// 別スレッドからも呼ばれるため
+				try {
+					Dispatcher.Invoke(() => {
+						PlayPositionSlider.Value = PlayRatio = 0.0f;
 					});
 				}
 				catch { /* キャンセルされたときは握りつぶす */ }
@@ -255,9 +264,8 @@ namespace SoundEffectToolGUI {
 				}
 				catch { /* キャンセルされたときは握りつぶす */ }
 			};
-
-				//PlayPositionSlider.
 		}
+
 		/// <summary>
 		/// タイマーを準備する
 		/// </summary>
@@ -333,6 +341,7 @@ namespace SoundEffectToolGUI {
 		/// </summary>
 		private void PlaySound() {
 			_soundEffectToolVM.PlayMainSoundAtPosition(PlayRatio * _soundFileLength);
+			PlayPositionSlider.Value = PlayRatio;
 		}
 
 		/// <summary>

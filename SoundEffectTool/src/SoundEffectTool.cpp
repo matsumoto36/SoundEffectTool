@@ -12,9 +12,9 @@ namespace SoundEffectTool {
 
 	SoundEffectToolManager::~SoundEffectToolManager() { }
 
-	void SoundEffectToolManager::CreateDxView(HWND windowHandle, string& rendererName, int width, int height) {
+	void SoundEffectToolManager::CreateDxView(HWND windowHandle, string& rendererName, PointInt size) {
 		auto renderer = make_unique<Renderer>();
-		renderer->Initialize(windowHandle, width, height);
+		renderer->Initialize(windowHandle, size);
 		_rendererList.emplace(rendererName, move(renderer));
 	}
 

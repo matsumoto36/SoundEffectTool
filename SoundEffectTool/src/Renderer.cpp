@@ -9,7 +9,7 @@ namespace SoundEffectTool {
 	Renderer::Renderer() = default;
 	Renderer::~Renderer() = default;
 
-	void Renderer::Initialize(HWND hwnd, int width, int height) {
+	void Renderer::Initialize(HWND hwnd, PointInt size) {
 
 		// Dxライブラリ初期化設定
 		SetUseDirect3DVersion(DX_DIRECT3D_9EX);				// DirectX 9EXにする
@@ -17,8 +17,8 @@ namespace SoundEffectTool {
 		ChangeWindowMode(TRUE);								// ウィンドウモードに設定
 		SetWindowSizeChangeEnableFlag(TRUE);				// ウィンドウサイズを可変に
 
-		GetDefaultState(&_maxWidth, &_maxHeight, NULL);		// デスクトップのウィンドウサイズを取得
-		SetGraphMode(_maxWidth, _maxHeight, 32);			// グラフィックモードの設定(最大)
+		GetDefaultState(&_maxSize.X, &_maxSize.Y, NULL);	// デスクトップのウィンドウサイズを取得
+		SetGraphMode(_maxSize.X, _maxSize.Y, 32);			// グラフィックモードの設定(最大)
 
 		SetAlwaysRunFlag(TRUE);								// 非アクティブ時も処理続行
 		SetDrawScreen(DX_SCREEN_BACK);						// 描画先をバックバッファへ設定
@@ -32,7 +32,7 @@ namespace SoundEffectTool {
 		if (DxLib_Init() == -1) return;
 
 		// ウィンドウサイズ変更
-		SetWindowSize(width, height);
+		SetWindowSize(size.X, size.Y);
 
 		// 背景色の設定
 		SetBackgroundColor(220, 220, 220);
@@ -56,13 +56,14 @@ namespace SoundEffectTool {
 		_audioData = audioData;
 
 		// デフォルトの設定で描画データ準備
-		CalcRenderingData(512, 50, 0, _audioData->GetSampleLength() / _audioData->GetChannelCount());
+		CalcRenderingData(PointInt(512, 100), 0, _audioData->GetSampleLength() / _audioData->GetChannelCount());
 		//CalcRenderingData(512, 50, 0, 4096);
 	}
 
-	void Renderer::CalcRenderingData(uint32_t pixelWidth, uint32_t pixelHeight, uint32_t sampleStart, uint32_t sampleLength) {
+	void Renderer::CalcRenderingData(PointInt pixelSize, uint32_t sampleStart, uint32_t sampleLength) {
 
 		if (!_audioData) return;
+		if (pixelSize.X == 0 || pixelSize.Y == 0) return;
 
 		auto channlCount = _audioData->GetChannelCount();
 		auto pointList = vector<vector<vector<int>>>();	// チャンネル・ピクセル位置ごとの点のリスト
@@ -70,10 +71,8 @@ namespace SoundEffectTool {
 		_waveDrawingPoints.resize(channlCount);
 		pointList.resize(channlCount);
 
-		_waveWidth = pixelWidth;
-		_waveHeight = pixelHeight;
-
-		if (pixelWidth == 0 || pixelHeight == 0) return;
+		_waveSize = pixelSize;
+		_drawSize = PointInt(_waveSize.X, _drawMarginY * 2 + (_waveSize.Y + _waveMarginY) * channlCount - _waveMarginY);
 
 		auto start = sampleStart * channlCount;
 		auto length = sampleLength * channlCount;
@@ -91,14 +90,13 @@ namespace SoundEffectTool {
 			}
 		}
 
-
 		// サイズを確保
 		for (size_t i = 0; i < (size_t)channlCount; i++) {
 			_waveDrawingPoints[i].clear();
-			pointList[i].resize(pixelWidth);
+			pointList[i].resize(pixelSize.X);
 		};
 
-		auto delta = (float)pixelWidth / sampleLength;
+		auto delta = (float)pixelSize.X / sampleLength;
 		// ピクセル位置ごとの高さのリストに変換
 		for (size_t i = 0; i < sampleLength; i++) {
 			// 横のピクセル位置を計算
@@ -112,13 +110,13 @@ namespace SoundEffectTool {
 		delete[] sampleData;
 
 		// 圧縮して追加する
-		for (size_t i = 0; i < pixelWidth; i++) {
+		for (size_t i = 0; i < (size_t)pixelSize.X; i++) {
 			for (size_t j = 0; j < (size_t)channlCount; j++) {
 				auto dataCount = pointList[j][i].size();
 				if (dataCount == 0U) continue;	// ない場合は追加しない
 				if (dataCount == 1U) {
 					// 高さを直して追加する
-					auto drawData = (float)pointList[j][i][0] / maxHeight * pixelHeight;
+					auto drawData = (float)pointList[j][i][0] / maxHeight * (pixelSize.Y / 2.0f);
 					_waveDrawingPoints[j].push_back(PointInt(i, (int)drawData));
 				}
 				else {
@@ -131,9 +129,9 @@ namespace SoundEffectTool {
 					}
 
 					// 高さを直して追加する
-					auto drawData = (float)sampleMinMax.X / maxHeight * pixelHeight;
+					auto drawData = (float)sampleMinMax.X / maxHeight * (pixelSize.Y / 2.0f);
 					_waveDrawingPoints[j].push_back(PointInt(i, (int)drawData));
-					drawData = (float)sampleMinMax.Y / maxHeight * pixelHeight;
+					drawData = (float)sampleMinMax.Y / maxHeight * (pixelSize.Y / 2.0f);
 					_waveDrawingPoints[j].push_back(PointInt(i, (int)drawData));
 				}
 			}
@@ -142,10 +140,8 @@ namespace SoundEffectTool {
 		
 	}
 
-	void Renderer::ChangeDrawSize(int width, int height) {
-		SetWindowSize(width, height);
-		_width = width;
-		_height = height;
+	void Renderer::ChangeDrawSize(PointInt size) {
+		SetWindowSize(size.X, size.Y);
 	}
 
 	void Renderer::DrawWave() const {
@@ -155,13 +151,17 @@ namespace SoundEffectTool {
 
 		auto waveColor = GetColor(0, 0, 255);
 		auto zeroLineColor = GetColor(32, 32, 32);
-		auto margin = 50;
-
-		auto offsetY = _waveHeight;
+		auto SideLineColor = GetColor(128, 128, 128);
+		auto waveSizeYHalf = _waveSize.Y / 2;
+		auto offsetY = _drawMarginY + waveSizeYHalf;
 		for (auto&& channel : _waveDrawingPoints) {
 			
 			// 波形の中心を引く
-			DrawLine(0, offsetY, _waveWidth, offsetY, zeroLineColor);
+			DrawLine(0, offsetY, _waveSize.X, offsetY, zeroLineColor);
+
+			// 波形の端を引く
+			DrawLine(0, offsetY - waveSizeYHalf, _waveSize.X, offsetY - waveSizeYHalf, SideLineColor);
+			DrawLine(0, offsetY + waveSizeYHalf, _waveSize.X, offsetY + waveSizeYHalf, SideLineColor);
 
 			// 点のリストを描画する
 			auto offsetX = 0;
@@ -172,7 +172,7 @@ namespace SoundEffectTool {
 				prevSample = currentSample;
 			}
 
-			offsetY += margin + _waveHeight;
+			offsetY += _waveSize.Y + _waveMarginY;
 		}
 
 		ScreenFlip();

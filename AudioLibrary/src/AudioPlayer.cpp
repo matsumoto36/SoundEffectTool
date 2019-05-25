@@ -99,9 +99,6 @@ namespace AudioLibrary {
 		// XAudio2のコールバックの動作を設定
 		_impl->OnXAudio2VoiceProcessingPassStart = [&](uint32_t requredBytes) {
 
-			//if (FAILED(CheckValidData())) return;
-
-			// *疑似的にストリーミング仕様にするとノイズが発生*
 			if (requredBytes == 0) return;
 			AddBuffer(requredBytes);
 
@@ -178,9 +175,6 @@ namespace AudioLibrary {
 
 		// フェード更新
 		UpdateFade(deltaTime);
-
-		//XAUDIO2_VOICE_STATE state;
-		//_impl->_sourceVoice->GetState(&state);
 
 		// 再生位置の計算
 		auto blockAlign = _impl->_audioData->GetFormat().nBlockAlign;
@@ -329,6 +323,7 @@ namespace AudioLibrary {
 			auto bytes = length - _seekData;
 			if (bytes <= 0) {
 				Stop();
+				if(OnPlayingEnd) OnPlayingEnd();
 				return;
 			}
 			buf.AudioBytes = (uint32_t)bytes;

@@ -19,6 +19,7 @@ namespace SoundEffectTool {
 
 		// ’Ê’m‚ðƒŠƒ“ƒN
 		player->OnIsPlayChanged = [&](bool isPlay) { OnIsPlayChanged(isPlay); };
+		player->OnPlayingEnd = [&]() { OnPlayingEnd(); };
 		player->OnVolumeChanged = [&](float volume) { OnVolumeChanged(volume); };
 
 		_impl->_player = move(player);

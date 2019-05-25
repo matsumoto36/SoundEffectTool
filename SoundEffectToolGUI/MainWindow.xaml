@@ -208,7 +208,7 @@
                         <xcad:LayoutAnchorablePane DockWidth="125" DockHeight="Auto">
                             <xcad:LayoutAnchorable ContentId="wave" Title="Wave" >
                                 <ScrollViewer HorizontalScrollBarVisibility="Auto">
-                                    <Image x:Name="Image" Height="Auto" SizeChanged="Image_SizeChanged" Stretch="None" Loaded="Image_Loaded">
+                                    <Image x:Name="Image" Height="512" Stretch="None" Loaded="Image_Loaded" Width="512" HorizontalAlignment="Left" VerticalAlignment="Top">
                                         <Image.Source>
                                             <i:D3DImage x:Name="D3DImage"></i:D3DImage>
                                         </Image.Source>

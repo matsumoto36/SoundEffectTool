@@ -7,9 +7,9 @@
 #include <memory>
 #include <map>
 
-#include "SoundEffectToolDefine.h"
 #include "Renderer.h"
 #include "AudioController.h"
+#include "SoundEffectToolDefine.h"
 
 using namespace std;
 
@@ -30,7 +30,7 @@ namespace SoundEffectTool {
 		~SoundEffectToolManager();
 		
 		// ウィンドウの生成
-		void CreateDxView(HWND windowHandle, string& rendererName, int width, int height);
+		void CreateDxView(HWND windowHandle, string& rendererName, PointInt size);
 
 		const unique_ptr<Renderer>& GetRenderer(string& rendererName);
 

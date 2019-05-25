@@ -25,6 +25,10 @@ namespace {
 			m->CallOnAudioIsPlayChanged(isPlay);
 		};
 
+		player->OnPlayingEnd = [m]() {
+			m->CallOnAudioPlayingEnd();
+		};
+
 		player->OnVolumeChanged = [m](float volume) {
 			m->CallOnAudioVolumeChanged(volume);
 		};
@@ -53,9 +57,9 @@ namespace SoundEffectTool {
 		delete _manager;
 	}
 
-	void SoundEffectToolVM::CreateDxView(IntPtr windowHandle, String^ windowName, int width, int height) {
+	void SoundEffectToolVM::CreateDxView(IntPtr windowHandle, String^ windowName, Size size) {
 		auto hwnd = reinterpret_cast<HWND>(windowHandle.ToPointer());
-		_manager->CreateDxView(hwnd, ToStdString(windowName), width, height);
+		_manager->CreateDxView(hwnd, ToStdString(windowName), PointInt((int)size.Width, (int)size.Height));
 	}
 
 	const IntPtr SoundEffectToolVM::GetBackBuffer(String^ windowName) {
@@ -65,12 +69,18 @@ namespace SoundEffectTool {
 		return IntPtr(const_cast<void*>(renderer->GetBackBuffer()));
 	}
 
-	bool SoundEffectToolVM::ChangeDrawSize(String^ windowName, int width, int height) {
+	bool SoundEffectToolVM::ChangeDrawSize(String^ windowName, PointInt size) {
 		auto&& renderer = _manager->GetRenderer(ToStdString(windowName));
 		if (!renderer) return false;
 
-		renderer->ChangeDrawSize(width, height);
+		renderer->ChangeDrawSize(size);
 		return true;
+	}
+
+	Size SoundEffectToolVM::GetDrawSize(String^ windowName) {
+		auto&& renderer = _manager->GetRenderer(ToStdString(windowName));
+		auto size = renderer->GetDrawSize();
+		return Size(size.X, size.Y);
 	}
 
 	bool SoundEffectToolVM::Draw(String^ windowName) {

@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 using namespace System;
+using namespace System::Windows;
 
 namespace SoundEffectTool {
 
@@ -13,6 +14,7 @@ namespace SoundEffectTool {
 
 		// コールバックバインド用
 		void CallOnAudioIsPlayChanged(bool isPlay) { OnAudioIsPlayChanged(isPlay); }
+		void CallOnAudioPlayingEnd() { OnAudioPlayingEnd(); }
 		void CallOnAudioVolumeChanged(float volume) { OnAudioVolumeChanged(volume); }
 
 	private:
@@ -22,6 +24,9 @@ namespace SoundEffectTool {
 		// 再生の状態が変化した場合に呼ばれる
 		event Action<bool>^ OnAudioIsPlayChanged;
 
+		// 最後まで再生されたときに呼ばれる
+		event Action^ OnAudioPlayingEnd;
+
 		// 音量が変化した場合に呼ばれる
 		event Action<float>^ OnAudioVolumeChanged;
 
@@ -30,13 +35,16 @@ namespace SoundEffectTool {
 		!SoundEffectToolVM();
 		
 		// ウィンドウの生成
-		void CreateDxView(IntPtr windowHandle, String^ windowName, int width, int height);
+		void CreateDxView(IntPtr windowHandle, String^ windowName, Size size);
 
 		// 対象のウィンドウのバックバッファを取得する
 		const IntPtr GetBackBuffer(String^ windowName);
 
 		// 描画サイズを変更する
-		bool ChangeDrawSize(String^ windowName, int width, int height);
+		bool ChangeDrawSize(String^ windowName, PointInt size);
+
+		// 描画サイズを返す
+		Size GetDrawSize(String^ windowName);
 
 		// 描画する
 		bool Draw(String^ windowName);

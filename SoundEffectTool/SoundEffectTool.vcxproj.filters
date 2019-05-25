@@ -9,6 +9,7 @@
     <ClInclude Include="include\SoundEffectToolDefine.h" />
     <ClInclude Include="include\AudioController.h" />
     <ClInclude Include="include\AudioPlayer.h" />
+    <ClInclude Include="include\PointInt.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp" />

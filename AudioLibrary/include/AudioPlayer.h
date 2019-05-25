@@ -15,6 +15,7 @@ namespace AudioLibrary {
 
 	public:
 		function<void(bool)> OnIsPlayChanged;			// Ä¶ó‘Ô‚ª•Ï‰»‚µ‚½‚Æ‚«‚ÉŒÄ‚Î‚ê‚é
+		function<void(void)> OnPlayingEnd;				// ÅŒã‚Ü‚ÅÄ¶‚³‚ê‚½‚Æ‚«‚ÉŒÄ‚Î‚ê‚é
 		function<void(float)> OnVolumeChanged;			// ‰¹—Ê‚ª•Ï‰»‚µ‚½‚Æ‚«‚ÉŒÄ‚Î‚ê‚é
 
 	private:
