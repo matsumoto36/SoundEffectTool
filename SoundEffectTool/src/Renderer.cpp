@@ -50,16 +50,6 @@ namespace SoundEffectTool {
 		return GetUseDirect3D9BackBufferSurface();
 	}
 
-	void Renderer::SetAudioData(const shared_ptr<AudioData> audioData) {
-
-		// 参照
-		_audioData = audioData;
-
-		// デフォルトの設定で描画データ準備
-		CalcRenderingData(PointInt(512, 100), 0, _audioData->GetSampleLength() / _audioData->GetChannelCount());
-		//CalcRenderingData(512, 50, 0, 4096);
-	}
-
 	void Renderer::CalcRenderingData(PointInt pixelSize, uint32_t sampleStart, uint32_t sampleLength) {
 
 		if (!_audioData) return;

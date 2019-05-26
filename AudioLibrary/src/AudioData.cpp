@@ -20,7 +20,7 @@ namespace AudioLibrary {
 		_impl(make_unique<Impl>(format, buffer)),
 		_wave(move(wave)),
 		_dataLength(buffer.AudioBytes),
-		_sampleLength(buffer.AudioBytes / format.nBlockAlign) { }
+		_sampleLength(buffer.AudioBytes / (format.wBitsPerSample / 8U)) { }
 
 	AudioData::~AudioData() {
 		_wave.reset();
@@ -36,11 +36,13 @@ namespace AudioLibrary {
 
 	bool AudioData::ReadSamples(uint32_t start, uint32_t length, int** outSamples) const {
 		if (length == 0) return false;
-		if (start + length > _sampleLength) return false;
 
 		auto byteCount = _impl->_format.wBitsPerSample / 8U;
+		if (start + length > _sampleLength) return false;
+
 		auto byteStart = start * byteCount;
 		auto waveData = _impl->_buffer.pAudioData;
+		auto bytes = _impl->_buffer.AudioBytes;
 
 		for (size_t i = 0; i < length; i++) {
 

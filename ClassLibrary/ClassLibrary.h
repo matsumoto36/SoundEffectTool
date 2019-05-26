@@ -64,6 +64,9 @@ namespace SoundEffectTool {
 		// 音声を描画にセット
 		bool SetWaveData(String^ windowName, String^ key);
 
+		// 波形の表示をスケーリングする
+		bool CalcWaveRenderingScale(String^ windowName, float pixelsPerSec);
+
 		// 再生しているかを取得する
 		bool IsPlay();
 

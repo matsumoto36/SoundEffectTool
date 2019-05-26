@@ -112,6 +112,10 @@ namespace SoundEffectTool {
 		return _manager->SetWaveData(ToStdString(windowName), ToStdString(key));
 	}
 
+	bool SoundEffectToolVM::CalcWaveRenderingScale(String^ windowName, float pixelsPerSec) {
+		return _manager->CalcWaveRenderingScale(ToStdString(windowName), pixelsPerSec);
+	}
+
 	bool SoundEffectToolVM::IsPlay() {
 		return _audioController.GetAudioPlayer("Main")->IsPlay();
 	}

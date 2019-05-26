@@ -43,8 +43,15 @@ namespace SoundEffectTool {
 		// バックバッファを返す
 		const void* GetBackBuffer() const;
 
-		// 波形の情報を変換してセットする
-		void SetAudioData(const shared_ptr<AudioData> audioData);
+		// 波形の情報を返す
+		const shared_ptr<AudioData> GetAudioData() {
+			return _audioData;
+		}
+
+		// 波形の情報を設定する
+		void SetAudioData(const shared_ptr<AudioData> audioData) {
+			_audioData = audioData;
+		}
 
 		// ピクセルの位置と高さから、波形の描画を事前計算をする(sampleStart, sampleLengthはチャンネル倍の値になる)
 		void CalcRenderingData(PointInt pixelSize, uint32_t sampleStart, uint32_t sampleLength);

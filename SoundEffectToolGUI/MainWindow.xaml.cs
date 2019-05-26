@@ -34,6 +34,7 @@ namespace SoundEffectToolGUI {
 		private DateTime _lastTick;
 		private float _soundFileLength;
 		private bool _playerPositionChanging;
+		private float _wavePixelsPerSec = 64;
 
 		private BitmapImage _startButtonImage;
 		private BitmapImage _pauseButtonImage;
@@ -76,6 +77,32 @@ namespace SoundEffectToolGUI {
 			SetupRendering();
 		}
 
+		private void Image_PreviewMouseWheel(object sender, MouseWheelEventArgs e) {
+
+			if(Keyboard.Modifiers != ModifierKeys.Control) return;
+
+			var delta = 2;
+			var min = 16;
+			var max = 1024;
+
+			var current = _wavePixelsPerSec;
+
+			if(e.Delta > 0)
+				current = Math.Min(current * delta, max);
+			else if(e.Delta < 0)
+				current = Math.Max(current / delta, min);
+
+			if(current == _wavePixelsPerSec) return;
+
+			// 横幅を変更する
+			_soundEffectToolVM.CalcWaveRenderingScale(_windowName, _wavePixelsPerSec = current);
+
+			// サイズ変更
+			var size = _soundEffectToolVM.GetDrawSize(_windowName);
+			Image.Width = size.Width;
+			Image.Height = size.Height;
+		}
+
 		/// <summary>
 		/// フロントバッファの更新
 		/// </summary>
@@ -93,10 +120,6 @@ namespace SoundEffectToolGUI {
 
 		private void MenuItem_Click(object sender, RoutedEventArgs e) {
 			MessageBox.Show("使用したライブラリ/フレームワーク\r\n・Dxlib\r\n・XAudio2\r\n・Extended WPF Toolkit", "情報", MessageBoxButton.OK);
-		}
-
-		private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
-			
 		}
 
 		private void StartButton_Click(object sender, RoutedEventArgs e) {
@@ -321,7 +344,7 @@ namespace SoundEffectToolGUI {
 		private void UpdateRendering(object sender, EventArgs e) {
 
 			var args = (RenderingEventArgs)e;
-			if(D3DImage.IsFrontBufferAvailable && _lastRender != args.RenderingTime) {
+			if(D3DImage.IsFrontBufferAvailable && _lastRender.TotalSeconds + 0.02 < args.RenderingTime.TotalSeconds) {
 
 				var backBuffer = _soundEffectToolVM.GetBackBuffer(_windowName);
 				if(backBuffer != IntPtr.Zero) {

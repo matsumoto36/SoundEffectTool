@@ -48,6 +48,24 @@ namespace SoundEffectTool {
 		// 情報を取得して投げる
 		renderer->SetAudioData(audioData);
 
+		// デフォルトの設定で描画データ準備
+		CalcWaveRenderingScale(rendererName, DefaultPixelsPerSec);
 		return true;
 	}
+
+	bool SoundEffectToolManager::CalcWaveRenderingScale(string& rendererName, float pixelsPerSec) {
+		auto&& renderer = GetRenderer(rendererName);
+		if (!renderer) return false;
+
+		auto audioData = renderer->GetAudioData();
+		if (!audioData) return false;
+
+		auto samplingRate = audioData->GetFormat().nSamplesPerSec;
+		auto length = audioData->GetSampleLength() / audioData->GetChannelCount();
+		auto sec = (float)length / samplingRate;
+		auto width = int(sec * pixelsPerSec);
+		renderer->CalcRenderingData(PointInt(width, DefaultWaveScaleY), 0, length);
+		return true;
+	}
+
 }

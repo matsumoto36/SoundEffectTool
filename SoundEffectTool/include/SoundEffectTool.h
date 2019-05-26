@@ -16,7 +16,10 @@ using namespace std;
 namespace SoundEffectTool {
 
 	class SOUNDEFFECTTOOL_API SoundEffectToolManager final sealed {
-
+		
+		const int DefaultWaveScaleY = 100;
+		const float DefaultPixelsPerSec = 64;
+		
 		map<string, unique_ptr<Renderer>> _rendererList;
 		unique_ptr<AudioController> _audioController;
 
@@ -41,6 +44,9 @@ namespace SoundEffectTool {
 
 		// 波形データを描画にセット
 		bool SetWaveData(string& rendererName, string& key);
+
+		// 波形の表示をスケーリングする
+		bool CalcWaveRenderingScale(string& rendererName, float pixelsPerSec);
 
 	private:
 
