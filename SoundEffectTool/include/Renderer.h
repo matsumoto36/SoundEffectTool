@@ -54,7 +54,7 @@ namespace SoundEffectTool {
 		}
 
 		// ピクセルの位置と高さから、波形の描画を事前計算をする(sampleStart, sampleLengthはチャンネル倍の値になる)
-		void CalcRenderingData(PointInt pixelSize, uint32_t sampleStart, uint32_t sampleLength);
+		void CalcRenderingData(PointInt pixelSize, uint32_t sampleStart, uint32_t sampleLength, uint32_t samplesPerSec = 500);
 
 		// 描画のサイズを変更する
 		void ChangeDrawSize(PointInt size);

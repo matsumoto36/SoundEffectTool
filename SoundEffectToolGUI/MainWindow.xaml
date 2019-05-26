@@ -207,10 +207,9 @@
                                 <ScrollViewer HorizontalScrollBarVisibility="Auto">
                                     <Grid>
                                         <Grid.RowDefinitions>
-                                            <RowDefinition Height="Auto"/>
                                             <RowDefinition/>
                                         </Grid.RowDefinitions>
-                                        <Image x:Name="Image" Height="512" Stretch="None" Loaded="Image_Loaded" Width="512" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Row="1" Margin="5" PreviewMouseWheel="Image_PreviewMouseWheel">
+                                        <Image x:Name="Image" Height="512" Stretch="None" Loaded="Image_Loaded" Width="512" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5" PreviewMouseWheel="Image_PreviewMouseWheel">
                                             <Image.Source>
                                                 <i:D3DImage x:Name="D3DImage"></i:D3DImage>
                                             </Image.Source>
