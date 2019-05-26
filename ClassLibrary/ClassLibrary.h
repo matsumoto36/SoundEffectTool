@@ -41,13 +41,13 @@ namespace SoundEffectTool {
 		const IntPtr GetBackBuffer(String^ windowName);
 
 		// 描画サイズを変更する
-		bool ChangeDrawSize(String^ windowName, PointInt size);
+		bool ChangeDrawSize(String^ windowName, Size size);
 
 		// 描画サイズを返す
 		Size GetDrawSize(String^ windowName);
 
 		// 描画する
-		bool Draw(String^ windowName, float playRatio);
+		bool Draw(String^ windowName, Point offset, float playRatio);
 
 		// 音声の情報を更新する
 		void UpdateAudio(float deltaTime);

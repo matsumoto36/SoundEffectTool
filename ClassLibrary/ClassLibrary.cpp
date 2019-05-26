@@ -69,11 +69,11 @@ namespace SoundEffectTool {
 		return IntPtr(const_cast<void*>(renderer->GetBackBuffer()));
 	}
 
-	bool SoundEffectToolVM::ChangeDrawSize(String^ windowName, PointInt size) {
+	bool SoundEffectToolVM::ChangeDrawSize(String^ windowName, Size size) {
 		auto&& renderer = _manager->GetRenderer(ToStdString(windowName));
 		if (!renderer) return false;
 
-		renderer->ChangeDrawSize(size);
+		renderer->ChangeDrawSize(PointInt((int)size.Width, (int)size.Height));
 		return true;
 	}
 
@@ -83,12 +83,12 @@ namespace SoundEffectTool {
 		return Size(size.X, size.Y);
 	}
 
-	bool SoundEffectToolVM::Draw(String^ windowName, float playRatio) {
+	bool SoundEffectToolVM::Draw(String^ windowName, Point offset, float playRatio) {
 		auto&& renderer = _manager->GetRenderer(ToStdString(windowName));
 		if (!renderer) 
 			return false;
 
-		renderer->DrawWave(playRatio);
+		renderer->Draw(PointInt((int)offset.X, (int)offset.Y), playRatio);
 		return true;
 	}
 

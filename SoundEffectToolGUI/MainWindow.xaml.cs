@@ -26,11 +26,11 @@ namespace SoundEffectToolGUI {
 		const string SoundKey = "MainSound";							// 音声ファイルにアクセスするためのキー
 		const string SoundFilePath = "Resource/Audio/MusicSurround.wav";	// 音声ファイルのパス
 		private SoundEffectToolVM _soundEffectToolVM;
-		private string _windowName = "DxLib";
+		private string _windowName = "WaveRenderer";
 		private TimeSpan _lastRender;
 
 		private DispatcherTimer _audioTick;
-
+		private Point _waveOffset;
 		private DateTime _lastTick;
 		private float _soundFileLength;
 		private bool _playerPositionChanging;
@@ -82,9 +82,10 @@ namespace SoundEffectToolGUI {
 			if(Keyboard.Modifiers != ModifierKeys.Control) return;
 			e.Handled = true;
 
+			// 倍率を設定
 			var delta = 2;
 			var min = 4;
-			var max = 256;
+			var max = 1024;
 
 			var current = _wavePixelsPerSec;
 
@@ -100,9 +101,16 @@ namespace SoundEffectToolGUI {
 
 			// サイズ変更
 			var size = _soundEffectToolVM.GetDrawSize(_windowName);
-			Image.RenderSize = size;
-			Image.Width = size.Width;
-			Image.Height = size.Height;
+			ImageRect.Width = size.Width;
+			ImageRect.Height = size.Height;
+		}
+
+		private void ScrollViewer_ScrollChanged(object sender, ScrollChangedEventArgs e) {
+			// スクロールしてもImageの位置が相対的に変わらないようにする
+			var margin = Image.Margin;
+			margin.Left = e.HorizontalOffset;
+			Image.Margin = margin;
+			_waveOffset.X = -e.HorizontalOffset;
 		}
 
 		/// <summary>
@@ -203,7 +211,9 @@ namespace SoundEffectToolGUI {
 			// ウィンドウハンドルを生成
 			var hwndSrc = new HwndSource(0, 0, 0, 0, 0, "DxLib", IntPtr.Zero);
 
-			_soundEffectToolVM.CreateDxView(hwndSrc.Handle, _windowName, new Size(1920, 1080));
+			// Imageは1920*1080固定
+			Image.RenderSize = new Size(1920, 1080);
+			_soundEffectToolVM.CreateDxView(hwndSrc.Handle, _windowName, Image.RenderSize);
 
 			D3DImage = new D3DImage();
 			Image.Source = D3DImage;
@@ -215,9 +225,8 @@ namespace SoundEffectToolGUI {
 			// 描画対象に設定
 			_soundEffectToolVM.SetWaveData(_windowName, SoundKey);
 			var size = _soundEffectToolVM.GetDrawSize(_windowName);
-			Image.RenderSize = size;
-			Image.Width = size.Width;
-			Image.Height = size.Height;
+			ImageRect.Width = size.Width;
+			ImageRect.Height = size.Height;
 		}
 
 		/// <summary>
@@ -357,7 +366,7 @@ namespace SoundEffectToolGUI {
 					// バックバッファの設定
 					D3DImage.SetBackBuffer(D3DResourceType.IDirect3DSurface9, backBuffer);
 					// 描画
-					_soundEffectToolVM.Draw(_windowName, PlayRatio);
+					_soundEffectToolVM.Draw(_windowName, _waveOffset, PlayRatio);
 					D3DImage.AddDirtyRect(new Int32Rect(0, 0, D3DImage.PixelWidth, D3DImage.PixelHeight));
 
 					D3DImage.Unlock();
@@ -400,5 +409,7 @@ namespace SoundEffectToolGUI {
 			var seconds = time - minites;
 			return string.Format("{0}:{1:00.00}", minites, seconds);
 		}
+
+
 	}
 }

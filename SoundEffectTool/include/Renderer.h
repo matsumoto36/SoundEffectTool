@@ -21,6 +21,8 @@ namespace SoundEffectTool {
 		PointInt _maxSize;		// 出力される画面の最大サイズ
 		PointInt _drawSize;
 
+		bool _isWaveRandered;
+		int _waveRenderHandler;
 		int _waveMarginY = 30;
 		int _drawMarginY = 10;
 		uint32_t _waveLength = 0;
@@ -54,7 +56,7 @@ namespace SoundEffectTool {
 		}
 
 		// ピクセルの位置と高さから、波形の描画を事前計算をする(sampleStart, sampleLengthはチャンネル倍の値になる)
-		void CalcRenderingData(PointInt pixelSize, uint32_t sampleStart, uint32_t sampleLength, uint32_t samplesPerSec = 500);
+		void CalcRenderingData(PointInt pixelSize, uint32_t sampleStart, uint32_t sampleLength, uint32_t samplesPerSec = 1000);
 
 		// 描画のサイズを変更する
 		void ChangeDrawSize(PointInt size);
@@ -64,8 +66,10 @@ namespace SoundEffectTool {
 			return _drawSize;
 		}
 
-		// 描画を更新する
-		void DrawWave(float playRatio) const;
+		// 波形を描画する
+		void DrawWave() const;
 
+		// 描画を更新する
+		void Draw(PointInt waveOffset, float playRatio) const;
 	};
 }

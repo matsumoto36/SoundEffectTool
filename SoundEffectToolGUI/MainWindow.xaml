@@ -204,18 +204,20 @@
 
                         <xcad:LayoutAnchorablePane DockWidth="125" DockHeight="Auto">
                             <xcad:LayoutAnchorable ContentId="wave" Title="Wave" >
-                                <ScrollViewer HorizontalScrollBarVisibility="Auto">
-                                    <Grid>
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition/>
-                                        </Grid.RowDefinitions>
-                                        <Image x:Name="Image" Height="512" Stretch="None" Loaded="Image_Loaded" Width="512" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5" PreviewMouseWheel="Image_PreviewMouseWheel">
-                                            <Image.Source>
-                                                <i:D3DImage x:Name="D3DImage"></i:D3DImage>
-                                            </Image.Source>
-                                        </Image>
-                                    </Grid>
-                                </ScrollViewer>
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <ScrollViewer x:Name="WaveScroll" HorizontalScrollBarVisibility="Auto" ScrollChanged="ScrollViewer_ScrollChanged">
+                                        <StackPanel x:Name="ImageRect" HorizontalAlignment="Left" VerticalAlignment="Top" Width="562" Height="220">
+                                            <Image x:Name="Image" Height="512" Stretch="None" Loaded="Image_Loaded" Width="512" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" PreviewMouseWheel="Image_PreviewMouseWheel">
+                                                <Image.Source>
+                                                    <i:D3DImage x:Name="D3DImage"></i:D3DImage>
+                                                </Image.Source>
+                                            </Image>
+                                        </StackPanel>
+                                    </ScrollViewer>
+                                </Grid>
                             </xcad:LayoutAnchorable>
                         </xcad:LayoutAnchorablePane>
                     </xcad:LayoutPanel>

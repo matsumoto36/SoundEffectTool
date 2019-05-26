@@ -27,6 +27,8 @@ namespace SoundEffectTool {
 		SetOutApplicationLogValidFlag(FALSE);				// ログ出力停止
 		SetDoubleStartValidFlag(TRUE);						// 多重起動を許可
 		SetUseIMEFlag(TRUE);								// IMEを有効
+			
+		SetDrawValidGraphCreateFlag(TRUE);					// 描画先に設定できる画像を作成できる
 
 		// Dxライブラリの初期化
 		if (DxLib_Init() == -1) return;
@@ -81,7 +83,6 @@ namespace SoundEffectTool {
 		}
 
 		// データを間引きして追加 44100 => toSamplingRate
-		toSamplingRate = pixelSize.X * 0.6f;
 		auto samplesPerSec = _audioData->GetFormat().nSamplesPerSec;
 		auto sampleMag = float(samplesPerSec / toSamplingRate);
 		auto dataCount = size_t(sampleLength / sampleMag);
@@ -106,14 +107,22 @@ namespace SoundEffectTool {
 		}
 
 		delete[] sampleData;
-		
+
+		// あらかじめ描画する
+		if (_isWaveRandered) DeleteGraph(_waveRenderHandler);
+		_waveRenderHandler = MakeGraph(_drawSize.X, _drawSize.Y);
+		DrawWave();
+		_isWaveRandered = true;
 	}
 
 	void Renderer::ChangeDrawSize(PointInt size) {
 		SetWindowSize(size.X, size.Y);
 	}
 
-	void Renderer::DrawWave(float playRatio) const {
+	void Renderer::DrawWave() const {
+
+		// ターゲットを指定
+		SetDrawScreen(_waveRenderHandler);
 
 		//画面を消す
 		ClearDrawScreen();
@@ -122,7 +131,6 @@ namespace SoundEffectTool {
 		const auto waveBackGroundColor = GetColor(220, 220, 220);
 
 		const auto zeroLineColor = GetColor(32, 32, 32);
-		const auto playRatioColor = GetColor(4, 4, 4);
 
 		auto waveSizeYHalf = _waveSize.Y / 2;
 		auto offsetX = 0;
@@ -145,12 +153,26 @@ namespace SoundEffectTool {
 
 			offsetY += _waveSize.Y + _waveMarginY;
 		}
+	}
+
+	void Renderer::Draw(PointInt waveOffset, float playRatio) const {
+
+		// ターゲットを指定
+		SetDrawScreen(DX_SCREEN_BACK);
+
+		//画面を消す
+		ClearDrawScreen();
+
+		// 波形を描画
+		DrawGraph(waveOffset.X, waveOffset.Y, _waveRenderHandler, FALSE);
+		
+		const auto playRatioColor = GetColor(4, 4, 4);
 
 		// 再生位置に縦線を引く
-		auto positionX = int(_waveSize.X * playRatio + offsetX);
+		auto positionX = int(_waveSize.X * playRatio + waveOffset.X);
 		DrawLine(positionX, 0, positionX, _drawSize.Y, playRatioColor);
-
 
 		ScreenFlip();
 	}
+
 }
