@@ -189,10 +189,9 @@
                                         <ColumnDefinition />
                                         <ColumnDefinition Width="50"/>
                                     </Grid.ColumnDefinitions>
-
-                                    <TextBox x:Name="PlayPositionText" Text="00:00" HorizontalAlignment="Center"/>
+                                    <Label x:Name="PlayPositionLabel" HorizontalAlignment="Center" Focusable="False" AllowDrop="False" Content="00:00"/>
                                     <Slider x:Name="PlayPositionSlider" Margin="10,0,10,0" Value="0" Maximum="1" Grid.Column="1" Style="{StaticResource CustomSliderStyle}" Foreground="{DynamicResource CyanBrush}" ValueChanged="PlayPositionSlider_ValueChanged" PreviewMouseDown="PlayPositionSlider_PreviewMouseDown" PreviewMouseUp="PlayPositionSlider_PreviewMouseUp"/>
-                                    <TextBox x:Name="SoundFileLengthText" Text="00:00" DockPanel.Dock="Right" Grid.Column="2" HorizontalAlignment="Center"/>
+                                    <Label x:Name="SoundFileLengthLabel" DockPanel.Dock="Right" Grid.Column="2" HorizontalAlignment="Center" Focusable="False" AllowDrop="False" Content="00:00"/>
                                 </Grid>
                             </StackPanel>
                         </xcad:LayoutAnchorable>
@@ -208,11 +207,17 @@
                         <xcad:LayoutAnchorablePane DockWidth="125" DockHeight="Auto">
                             <xcad:LayoutAnchorable ContentId="wave" Title="Wave" >
                                 <ScrollViewer HorizontalScrollBarVisibility="Auto">
-                                    <Image x:Name="Image" Height="512" Stretch="None" Loaded="Image_Loaded" Width="512" HorizontalAlignment="Left" VerticalAlignment="Top">
-                                        <Image.Source>
-                                            <i:D3DImage x:Name="D3DImage"></i:D3DImage>
-                                        </Image.Source>
-                                    </Image>
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition/>
+                                        </Grid.RowDefinitions>
+                                        <Image x:Name="Image" Height="512" Stretch="None" Loaded="Image_Loaded" Width="512" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Row="1" Margin="5">
+                                            <Image.Source>
+                                                <i:D3DImage x:Name="D3DImage"></i:D3DImage>
+                                            </Image.Source>
+                                        </Image>
+                                    </Grid>
                                 </ScrollViewer>
                             </xcad:LayoutAnchorable>
                         </xcad:LayoutAnchorablePane>

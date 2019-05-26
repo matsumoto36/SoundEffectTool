@@ -58,7 +58,7 @@ namespace SoundEffectTool {
 		}
 
 		// •`‰æ‚ğXV‚·‚é
-		void DrawWave() const;
+		void DrawWave(float playRatio) const;
 
 	};
 }

@@ -83,12 +83,12 @@ namespace SoundEffectTool {
 		return Size(size.X, size.Y);
 	}
 
-	bool SoundEffectToolVM::Draw(String^ windowName) {
+	bool SoundEffectToolVM::Draw(String^ windowName, float playRatio) {
 		auto&& renderer = _manager->GetRenderer(ToStdString(windowName));
 		if (!renderer) 
 			return false;
 
-		renderer->DrawWave();
+		renderer->DrawWave(playRatio);
 		return true;
 	}
 

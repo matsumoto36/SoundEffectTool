@@ -135,7 +135,7 @@ namespace SoundEffectToolGUI {
 		private void PlayPositionSlider_PreviewMouseUp(object sender, MouseButtonEventArgs e) {
 			_playerPositionChanging = false;
 			PlayRatio = (float)PlayPositionSlider.Value;
-			PlayPositionText.Text = ToTime(PlayRatio * _soundFileLength);
+			PlayPositionLabel.Content = ToTime(PlayRatio * _soundFileLength);
 			if(_soundEffectToolVM.IsPlay()) {
 				// 再生位置を変更して再生
 				_soundEffectToolVM.PlayMainSoundAtPosition(PlayRatio * _soundFileLength);
@@ -143,7 +143,7 @@ namespace SoundEffectToolGUI {
 		}
 
 		private void PlayPositionSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {
-			PlayPositionText.Text = ToTime(PlayRatio * _soundFileLength);
+			PlayPositionLabel.Content = ToTime(PlayRatio * _soundFileLength);
 		}
 		#endregion
 
@@ -170,6 +170,10 @@ namespace SoundEffectToolGUI {
 		/// レンダリングシステムを準備する
 		/// </summary>
 		private void SetupRendering() {
+
+			// くっきり表示させる
+			RenderOptions.SetEdgeMode(Image, EdgeMode.Aliased);
+			RenderOptions.SetBitmapScalingMode(Image, BitmapScalingMode.NearestNeighbor);
 
 			// ウィンドウハンドルを生成
 			var hwndSrc = new HwndSource(0, 0, 0, 0, 0, "DxLib", IntPtr.Zero);
@@ -202,7 +206,7 @@ namespace SoundEffectToolGUI {
 
 			// 長さを取得
 			_soundFileLength = _soundEffectToolVM.GetSoundFileLength();
-			SoundFileLengthText.Text = ToTime(_soundFileLength);
+			SoundFileLengthLabel.Content = ToTime(_soundFileLength);
 
 			// 再生状況が変化したときにアイコンを変更
 			_soundEffectToolVM.OnAudioIsPlayChanged += isPlay => {
@@ -293,7 +297,7 @@ namespace SoundEffectToolGUI {
 
 				// 再生情報
 				PlayRatio = ratio;
-				PlayPositionText.Text = ToTime(position);
+				PlayPositionLabel.Content = ToTime(position);
 
 				// 一秒ごとに再生位置の表示更新
 				if (Math.Floor(position) != Math.Floor(position - deltaTime) && !_playerPositionChanging) {
@@ -327,7 +331,7 @@ namespace SoundEffectToolGUI {
 					// バックバッファの設定
 					D3DImage.SetBackBuffer(D3DResourceType.IDirect3DSurface9, backBuffer);
 					// 描画
-					_soundEffectToolVM.Draw(_windowName);
+					_soundEffectToolVM.Draw(_windowName, PlayRatio);
 					D3DImage.AddDirtyRect(new Int32Rect(0, 0, D3DImage.PixelWidth, D3DImage.PixelHeight));
 
 					D3DImage.Unlock();

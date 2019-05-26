@@ -47,7 +47,7 @@ namespace SoundEffectTool {
 		Size GetDrawSize(String^ windowName);
 
 		// 描画する
-		bool Draw(String^ windowName);
+		bool Draw(String^ windowName, float playRatio);
 
 		// 音声の情報を更新する
 		void UpdateAudio(float deltaTime);

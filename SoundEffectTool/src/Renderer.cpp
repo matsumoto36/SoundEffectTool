@@ -35,7 +35,7 @@ namespace SoundEffectTool {
 		SetWindowSize(size.X, size.Y);
 
 		// ”wŒiF‚Ìİ’è
-		SetBackgroundColor(220, 220, 220);
+		SetBackgroundColor(32, 32, 32);
 	}
 
 	void Renderer::Finalize() {
@@ -144,27 +144,29 @@ namespace SoundEffectTool {
 		SetWindowSize(size.X, size.Y);
 	}
 
-	void Renderer::DrawWave() const {
+	void Renderer::DrawWave(float playRatio) const {
 
 		//‰æ–Ê‚ğÁ‚·
 		ClearDrawScreen();
 
-		auto waveColor = GetColor(0, 0, 255);
-		auto zeroLineColor = GetColor(32, 32, 32);
-		auto SideLineColor = GetColor(128, 128, 128);
+		const auto waveColor = GetColor(0, 0, 255);
+		const auto waveBackGroundColor = GetColor(220, 220, 220);
+
+		const auto zeroLineColor = GetColor(32, 32, 32);
+		const auto playRatioColor = GetColor(4, 4, 4);
+
 		auto waveSizeYHalf = _waveSize.Y / 2;
+		auto offsetX = 0;
 		auto offsetY = _drawMarginY + waveSizeYHalf;
 		for (auto&& channel : _waveDrawingPoints) {
 			
 			// ”gŒ`‚Ì’†S‚ğˆø‚­
 			DrawLine(0, offsetY, _waveSize.X, offsetY, zeroLineColor);
 
-			// ”gŒ`‚Ì’[‚ğˆø‚­
-			DrawLine(0, offsetY - waveSizeYHalf, _waveSize.X, offsetY - waveSizeYHalf, SideLineColor);
-			DrawLine(0, offsetY + waveSizeYHalf, _waveSize.X, offsetY + waveSizeYHalf, SideLineColor);
+			// ”gŒ`‚Ì”wŒi‚ğ•`‚­
+			DrawFillBox(0, offsetY - waveSizeYHalf, _waveSize.X, offsetY + waveSizeYHalf, waveBackGroundColor);
 
 			// “_‚ÌƒŠƒXƒg‚ğ•`‰æ‚·‚é
-			auto offsetX = 0;
 			auto prevSample = channel[0];
 			for (size_t i = 1; i < channel.size(); i++) {
 				auto currentSample = channel[i];
@@ -174,6 +176,11 @@ namespace SoundEffectTool {
 
 			offsetY += _waveSize.Y + _waveMarginY;
 		}
+
+		// Ä¶ˆÊ’u‚Écü‚ğˆø‚­
+		auto positionX = int(_waveSize.X * playRatio + offsetX);
+		DrawLine(positionX, 0, positionX, _drawSize.Y, playRatioColor);
+
 
 		ScreenFlip();
 	}
