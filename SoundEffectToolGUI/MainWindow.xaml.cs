@@ -128,7 +128,11 @@ namespace SoundEffectToolGUI {
 			}
 		}
 
-		private void MenuItem_Click(object sender, RoutedEventArgs e) {
+		private void MenuItem_Exit_Click(object sender, RoutedEventArgs e) {
+			Close();
+		}
+
+		private void MenuItem_Info_Click(object sender, RoutedEventArgs e) {
 			MessageBox.Show("使用したライブラリ/フレームワーク\r\n・Dxlib\r\n・XAudio2\r\n・Extended WPF Toolkit", "情報", MessageBoxButton.OK);
 		}
 
@@ -409,7 +413,5 @@ namespace SoundEffectToolGUI {
 			var seconds = time - minites;
 			return string.Format("{0}:{1:00.00}", minites, seconds);
 		}
-
-
 	}
 }
