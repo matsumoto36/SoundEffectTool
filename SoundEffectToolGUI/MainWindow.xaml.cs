@@ -34,7 +34,7 @@ namespace SoundEffectToolGUI {
 		private DateTime _lastTick;
 		private float _soundFileLength;
 		private bool _playerPositionChanging;
-		private float _wavePixelsPerSec = 64;
+		//private float _wavePixelsPerSec = 64;
 
 		private BitmapImage _startButtonImage;
 		private BitmapImage _pauseButtonImage;
@@ -79,28 +79,28 @@ namespace SoundEffectToolGUI {
 
 		private void Image_PreviewMouseWheel(object sender, MouseWheelEventArgs e) {
 
-			if(Keyboard.Modifiers != ModifierKeys.Control) return;
+			//if(Keyboard.Modifiers != ModifierKeys.Control) return;
 
-			var delta = 2;
-			var min = 16;
-			var max = 1024;
+			//var delta = 2;
+			//var min = 16;
+			//var max = 1024;
 
-			var current = _wavePixelsPerSec;
+			//var current = _wavePixelsPerSec;
 
-			if(e.Delta > 0)
-				current = Math.Min(current * delta, max);
-			else if(e.Delta < 0)
-				current = Math.Max(current / delta, min);
+			//if(e.Delta > 0)
+			//	current = Math.Min(current * delta, max);
+			//else if(e.Delta < 0)
+			//	current = Math.Max(current / delta, min);
 
-			if(current == _wavePixelsPerSec) return;
+			//if(current == _wavePixelsPerSec) return;
 
-			// 横幅を変更する
-			_soundEffectToolVM.CalcWaveRenderingScale(_windowName, _wavePixelsPerSec = current);
+			//// 横幅を変更する
+			//_soundEffectToolVM.CalcWaveRenderingScale(_windowName, _wavePixelsPerSec = current);
 
-			// サイズ変更
-			var size = _soundEffectToolVM.GetDrawSize(_windowName);
-			Image.Width = size.Width;
-			Image.Height = size.Height;
+			//// サイズ変更
+			//var size = _soundEffectToolVM.GetDrawSize(_windowName);
+			//Image.Width = size.Width;
+			//Image.Height = size.Height;
 		}
 
 		/// <summary>
