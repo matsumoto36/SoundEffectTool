@@ -62,6 +62,8 @@ namespace SoundEffectTool {
 		pointList.resize(channlCount);
 
 		_waveSize = pixelSize;
+
+		// 描画のサイズを計算(WPFのImageのサイズに使用される)
 		_drawSize = PointInt(_waveSize.X, _drawMarginY * 2 + (_waveSize.Y + _waveMarginY) * channlCount - _waveMarginY);
 
 		auto start = sampleStart * channlCount;
@@ -71,14 +73,6 @@ namespace SoundEffectTool {
 		// サンプルデータを取得
 		auto sampleData = new int[length];
 		_audioData->ReadSamples(start, length, &sampleData);
-
-		// 最大値を求める
-		for (size_t i = 0; i < length; i++) {
-			auto sample = abs(sampleData[i]);
-			if (sample > maxHeight) {
-				maxHeight = sample;
-			}
-		}
 
 		// サイズを確保
 		for (size_t i = 0; i < (size_t)channlCount; i++) {
@@ -93,6 +87,12 @@ namespace SoundEffectTool {
 			auto x = (size_t)(delta * i);
 			for (size_t j = 0; j < (size_t)channlCount; j++) {
 				auto sample = sampleData[i * channlCount + j];
+				
+				// 最大値を求める
+				if (abs(sample) > maxHeight) {
+					maxHeight = sample;
+				}
+
 				pointList[j][x].push_back(sample);
 			}
 		}

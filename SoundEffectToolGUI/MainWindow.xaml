@@ -25,7 +25,6 @@
             </Setter>
         </Style>
 
-        <!-- このサンプルでは、簡潔に記述する為に全て Foreground を基準に色を決定しています。個別に指定する場合は、適宜書き換えてください -->
         <Style x:Key="CustomSliderStyle" TargetType="{x:Type Slider}">
             <Style.Triggers>
                 <Trigger Property="Orientation" Value="Horizontal">
