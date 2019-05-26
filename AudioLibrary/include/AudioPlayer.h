@@ -71,7 +71,7 @@ namespace AudioLibrary {
 		void Update(float deltaTime);
 
 		// 音を再生する
-		HRESULT Play(UINT32 samples);
+		HRESULT Play(uint32_t samples);
 
 		// 音を止める
 		HRESULT Stop();
@@ -87,7 +87,7 @@ namespace AudioLibrary {
 		// データが整っているか調べる
 		HRESULT CheckValidData() const;
 
-		void AddBuffer(UINT32 requredBytes);
+		void AddBuffer(uint32_t requredBytes);
 
 		// 内部で使用するためのフェード
 		void SetFade(float targetVolume, float targetTime, function<void()> callback = nullptr);

@@ -135,6 +135,7 @@ namespace SoundEffectToolGUI {
 		private void PlayPositionSlider_PreviewMouseUp(object sender, MouseButtonEventArgs e) {
 			_playerPositionChanging = false;
 			PlayRatio = (float)PlayPositionSlider.Value;
+			PlayPositionText.Text = ToTime(PlayRatio * _soundFileLength);
 			if(_soundEffectToolVM.IsPlay()) {
 				// 再生位置を変更して再生
 				_soundEffectToolVM.PlayMainSoundAtPosition(PlayRatio * _soundFileLength);
@@ -277,8 +278,6 @@ namespace SoundEffectToolGUI {
 			_lastTick = DateTime.Now;
 			_audioTick.Tick += (s, e) => {
 
-				if(!_soundEffectToolVM.IsPlay()) return;
-
 				// 音楽系更新
 				var deltaTime = (float)(DateTime.Now - _lastTick).TotalSeconds;
 				_soundEffectToolVM.UpdateAudio(deltaTime);
@@ -289,6 +288,8 @@ namespace SoundEffectToolGUI {
 				if(_soundFileLength == 0) {
 					ratio = 0;
 				}
+
+				if(!_soundEffectToolVM.IsPlay()) return;
 
 				// 再生情報
 				PlayRatio = ratio;

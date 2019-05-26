@@ -7,7 +7,7 @@ namespace {
 	float ToDecibelRatio(float volume) {
 		if (volume == 0) return 0;
 
-		return XAudio2DecibelsToAmplitudeRatio(1 - volume * -40.0f);
+		return XAudio2DecibelsToAmplitudeRatio((1 - volume) * -40.0f);
 	}
 }
 
@@ -26,7 +26,7 @@ namespace AudioLibrary {
 
 		void STDMETHODCALLTYPE OnStreamEnd();
 		void STDMETHODCALLTYPE OnVoiceProcessingPassEnd();
-		void STDMETHODCALLTYPE OnVoiceProcessingPassStart(UINT32 samplesRequired);
+		void STDMETHODCALLTYPE OnVoiceProcessingPassStart(uint32_t bytesRequired);
 		void STDMETHODCALLTYPE OnBufferEnd(void * pBufferContext);
 		void STDMETHODCALLTYPE OnBufferStart(void * pBufferContext);
 		void STDMETHODCALLTYPE OnLoopEnd(void * pBufferContext);
@@ -39,7 +39,7 @@ namespace AudioLibrary {
 		unique_ptr<IXAudio2VoiceCallback> _callback;	// ソースボイスのコールバック
 		shared_ptr<AudioData> _audioData;				// 再生する音声データ
 		
-		const float FadeTime = 0.1f;					// 内部フェードの時間
+		const float FadeTime = 0.01f;					// 内部フェードの時間
 		float _xaudio2Volume;							// 詳細な音量 内部フェードの制御用
 
 		// XAudio2のコールバックをラップする
@@ -68,9 +68,9 @@ namespace AudioLibrary {
 		if (!Player._impl->OnXAudio2VoiceProcessingPassEnd) return;
 		Player._impl->OnXAudio2VoiceProcessingPassEnd();
 	}
-	void STDMETHODCALLTYPE AudioPlayer::VoiceCallback::OnVoiceProcessingPassStart(uint32_t bytesRequired) {
+	void STDMETHODCALLTYPE AudioPlayer::VoiceCallback::OnVoiceProcessingPassStart(uint32_t requredBytes) {
 		if (!Player._impl->OnXAudio2VoiceProcessingPassStart) return;
-		Player._impl->OnXAudio2VoiceProcessingPassStart(bytesRequired);
+		Player._impl->OnXAudio2VoiceProcessingPassStart(requredBytes);
 	}
 	void STDMETHODCALLTYPE AudioPlayer::VoiceCallback::OnBufferEnd(void * pBufferContext) {
 		if (!Player._impl->OnXAudio2BufferEnd) return;
@@ -102,14 +102,6 @@ namespace AudioLibrary {
 			if (requredBytes == 0) return;
 			AddBuffer(requredBytes);
 
-		};
-
-		_impl->OnXAudio2BufferEnd = [&](void * pBufferContext) {
-			// 今回はバッファの終了が再生の終了
-			//XAUDIO2_VOICE_STATE state;
-			//_impl->_sourceVoice->GetState(&state);
-			//if(state.BuffersQueued < 3)
-			//	AddBuffer(1764);
 		};
 	}
 
@@ -200,11 +192,14 @@ namespace AudioLibrary {
 				break;
 		}
 
+		_impl->_sourceVoice->FlushSourceBuffers();
+
 		_position = samples;
 		auto blockAlign = _impl->_audioData->GetFormat().nBlockAlign;
 		_seekData = _position * blockAlign;
 
 		// 音量の設定
+		_impl->_sourceVoice->SetVolume(ToDecibelRatio(_impl->_xaudio2Volume = 0));
 		SetFade(_volume, _impl->FadeTime);
 
 
@@ -235,7 +230,7 @@ namespace AudioLibrary {
 				break;
 		}
 
-		//SetFade(0, _impl->FadeTime, [&]() {
+		SetFade(0, _impl->FadeTime, [&]() {
 
 			if (FAILED(hr = _impl->_sourceVoice->Stop())) {
 				wprintf(L"Error %#X failed stop audio\n", hr);
@@ -246,7 +241,7 @@ namespace AudioLibrary {
 			// 止めて最初から再生したい場合はFlushSourceBuffersを実行する
 			_impl->_sourceVoice->FlushSourceBuffers();
 		
-		//});
+		});
 		SetPlayerStatus(AudioPlayerStatus::Stop);
 
 
@@ -308,31 +303,33 @@ namespace AudioLibrary {
 
 	void AudioPlayer::AddBuffer(uint32_t requredBytes) {
 
-		auto&& p = _impl->_audioData->GetBuffer().pAudioData;
+		auto&& p = _impl->_audioData->GetWaveData();
 		XAUDIO2_BUFFER buf = { 0 };
-		buf.pAudioData = &p[_seekData];
-		volatile auto a = p[_seekData];
 
 		// リクエストに対して存在しているサンプルを計算
 		auto length = _impl->_audioData->GetBuffer().AudioBytes;
-		if (length >= _seekData + requredBytes) {
-			buf.AudioBytes = requredBytes;
-			_seekData += requredBytes;
-		}
-		else {
-			auto bytes = length - _seekData;
-			if (bytes <= 0) {
+		if (length < _seekData + requredBytes) {
+			
+			// 最後に転送する量を設定
+			requredBytes = length - _seekData;
+
+			if (requredBytes <= 0) {
+				// 最後まで鳴らし終わったとき
 				Stop();
-				if(OnPlayingEnd) OnPlayingEnd();
+				if (OnPlayingEnd) OnPlayingEnd();
 				return;
 			}
-			buf.AudioBytes = (uint32_t)bytes;
 			// ストリーミング再生終了フラグ
 			buf.Flags = XAUDIO2_END_OF_STREAM;
-			_seekData += bytes;
 		}
 
+		buf.pAudioData = &p[_seekData];
+		buf.AudioBytes = requredBytes;
+
 		_impl->_sourceVoice->SubmitSourceBuffer(&buf);
+
+		// 再生位置を進める
+		_seekData += requredBytes;
 	}
 
 	void AudioPlayer::SetFade(float targetVolume, float targetTime, function<void()> callback) {
