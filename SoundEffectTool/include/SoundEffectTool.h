@@ -17,13 +17,13 @@ namespace SoundEffectTool {
 
 	class SOUNDEFFECTTOOL_API SoundEffectToolManager final sealed {
 		
-		const int DefaultWaveScaleY = 100;
-		const float DefaultPixelsPerSec = 64;
-		
-		map<string, unique_ptr<Renderer>> _rendererList;
-		unique_ptr<AudioController> _audioController;
+		map<string, unique_ptr<Renderer>> _rendererList;	// 描画ウィンドウのテーブル
+		unique_ptr<AudioController> _audioController;		// サウンドコントローラー
 
 	public:
+
+		const int DefaultWaveHeight = 100;					// 波形の描画の高さ
+		const float DefaultPixelsPerSec = 64;				// 1秒間のデータを何ピクセルで表すか
 
 		// コピーは禁止するが、ムーブは許可する
 		SoundEffectToolManager(const SoundEffectToolManager&) = delete;
@@ -35,8 +35,10 @@ namespace SoundEffectTool {
 		// ウィンドウの生成
 		void CreateDxView(HWND windowHandle, string& rendererName, PointInt size);
 
+		// 描画を返す
 		const unique_ptr<Renderer>& GetRenderer(string& rendererName);
 
+		// サウンドコントローラーを返す
 		AudioController& GetAudioController() const;
 
 		// 音声データをプレイヤーにセット

@@ -41,6 +41,9 @@ namespace SoundEffectTool {
 		// 対象のウィンドウのバックバッファを取得する
 		const IntPtr GetBackBuffer(String^ windowName);
 
+		// 基本の1秒間のデータを何ピクセルで表すかを返す
+		float GetDefaultPixelsPerSec();
+
 		// 描画サイズを変更する
 		bool ChangeDrawSize(String^ windowName, Size size);
 

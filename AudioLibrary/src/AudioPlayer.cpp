@@ -114,7 +114,6 @@ namespace AudioLibrary {
 
 		// 同じ値はセットしない
 		if (_volume == volume) return;
-
 		_volume = volume;
 
 		if (_impl->_sourceVoice == nullptr) return;
@@ -175,7 +174,7 @@ namespace AudioLibrary {
 	}
 
 	HRESULT AudioPlayer::Play(uint32_t samples) {
-		// byte単位からサンプル単位に直すべき
+
 		Stop();
 
 		auto hr = S_OK;
@@ -265,14 +264,13 @@ namespace AudioLibrary {
 		}
 
 		// Stopが一時停止になる
-		//SetFade(0, _impl->FadeTime, [&]() {
+		SetFade(0, _impl->FadeTime, [&]() {
 
 			if (FAILED(hr = _impl->_sourceVoice->Stop())) {
 				wprintf(L"Error %#X failed stop audio\n", hr);
-				return hr;
 			}
 
-		//});
+		});
 		SetPlayerStatus(AudioPlayerStatus::Pause);
 
 		return hr;
@@ -311,7 +309,7 @@ namespace AudioLibrary {
 		if (length < _seekData + requredBytes) {
 			
 			// 最後に転送する量を設定
-			requredBytes = length - _seekData;
+			requredBytes = uint32_t(length - _seekData);
 
 			if (requredBytes <= 0) {
 				// 最後まで鳴らし終わったとき
@@ -345,8 +343,8 @@ namespace AudioLibrary {
 		
 		_fading += deltaTime;
 
-		// フェード完了
 		if (_fading >= _targetTime) {
+			// フェード完了したとき
 			_fading = _targetTime;
 			_impl->_sourceVoice->SetVolume(ToDecibelRatio(_impl->_xaudio2Volume = _targetVolume));
 			if (_fadeCallback) _fadeCallback();

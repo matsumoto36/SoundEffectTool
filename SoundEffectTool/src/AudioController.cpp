@@ -5,12 +5,8 @@
 
 namespace SoundEffectTool {
 
-	struct AudioController::Impl {
-		map<string, shared_ptr<AudioData>> _audioDataList;
-	};
 
-	AudioController::AudioController() :
-		_impl(make_unique<Impl>()) {
+	AudioController::AudioController() {
 
 		// サウンドシステムの初期化
 		auto&& audio = Audio::GetInstance();
@@ -52,14 +48,14 @@ namespace SoundEffectTool {
 		return _audioPlayerList[key];
 	}
 
-	shared_ptr<AudioData> AudioController::GetAudioData(const string& key) const {
+	shared_ptr<AudioData> AudioController::GetAudioData(const string& key) {
 
 		if (!IsValidAudioData(key)) {
 			printf("Sound data is not found. key=%s", key.c_str());
 			return nullptr;
 		}
 
-		return _impl->_audioDataList[key];
+		return _audioDataList[key];
 	}
 
 	void AudioController::Update(float deltaTime) const {
@@ -69,7 +65,7 @@ namespace SoundEffectTool {
 		}
 	}
 
-	bool AudioController::LoadSound(const wstring& filePath, const string& key) const {
+	bool AudioController::LoadSound(const wstring& filePath, const string& key) {
 
 		// 同じキーで登録できないようにする
 		if (IsValidAudioData(key)) {
@@ -86,11 +82,11 @@ namespace SoundEffectTool {
 		}
 
 		// 追加
-		_impl->_audioDataList.emplace(key, move(audioData));
+		_audioDataList.emplace(key, move(audioData));
 		return true;
 	}
 
-	bool AudioController::UnLoadSound(const string& key) const {
+	bool AudioController::UnLoadSound(const string& key) {
 
 		if (!IsValidAudioData(key)) {
 			printf("Sound data is not found. key=%s", key.c_str());
@@ -98,7 +94,7 @@ namespace SoundEffectTool {
 		}
 
 		// 削除 (shared_ptrなので開放される予定)
-		_impl->_audioDataList.erase(key);
+		_audioDataList.erase(key);
 		return true;
 	}
 
@@ -107,7 +103,7 @@ namespace SoundEffectTool {
 	}
 
 	bool AudioController::IsValidAudioData(const string& key) const {
-		return _impl->_audioDataList.count(key) > 0;
+		return _audioDataList.count(key) > 0;
 	}
 
 

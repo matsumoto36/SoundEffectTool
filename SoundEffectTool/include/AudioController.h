@@ -17,10 +17,8 @@ namespace SoundEffectTool {
 
 	private:
 
-		map<string, shared_ptr<AudioPlayer>> _audioPlayerList;
-
-		struct Impl;
-		unique_ptr<Impl> _impl;
+		map<string, shared_ptr<AudioPlayer>> _audioPlayerList;	// 生成したプレイヤーのテーブル
+		map<string, shared_ptr<AudioData>> _audioDataList;		// 読み込んだ音声データのテーブル
 
 	public:
 		// コピーは禁止するが、ムーブは許可する
@@ -37,16 +35,16 @@ namespace SoundEffectTool {
 		shared_ptr<AudioPlayer> GetAudioPlayer(const string& key);
 
 		// 音声データを取得する
-		shared_ptr<AudioData> GetAudioData(const string& key) const;
+		shared_ptr<AudioData> GetAudioData(const string& key);
 
 		// 情報を更新する
 		void Update(float deltaTime) const;
 
 		// 音声をロードする(keyをアクセスキーとして登録)
-		bool LoadSound(const wstring& filePath, const string& key) const;
+		bool LoadSound(const wstring& filePath, const string& key);
 
 		// 音声を解放する
-		bool UnLoadSound(const string& key) const;
+		bool UnLoadSound(const string& key);
 
 	private:
 

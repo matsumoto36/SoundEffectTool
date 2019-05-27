@@ -42,9 +42,7 @@ namespace AudioLibrary {
 		}
 
 		// •Ô‹p
-		auto ex = make_unique<WAVEFORMATEX>();
-		auto&& a = *waveData.wfx;
-		outAudioData = move(make_shared<AudioData>(a, move(waveFile), buffer));
+		outAudioData = move(make_shared<AudioData>(*waveData.wfx, move(waveFile), buffer));
 
 		return hr;
 	}

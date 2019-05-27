@@ -36,13 +36,11 @@ namespace AudioLibrary {
 
 	bool AudioData::ReadSamples(uint32_t start, uint32_t length, int** outSamples) const {
 		if (length == 0) return false;
-
-		auto byteCount = _impl->_format.wBitsPerSample / 8U;
 		if (start + length > _sampleLength) return false;
 
+		auto byteCount = _impl->_format.wBitsPerSample / 8U;
 		auto byteStart = start * byteCount;
 		auto waveData = _impl->_buffer.pAudioData;
-		auto bytes = _impl->_buffer.AudioBytes;
 
 		for (size_t i = 0; i < length; i++) {
 
@@ -61,8 +59,6 @@ namespace AudioLibrary {
 				temp = temp << 8;
 				temp |= waveData[position];
 
-				// char‚Ì”ÍˆÍ‚É¬Œ^‚·‚é
-				//sample = (char)((float)temp / 256);
 				sample = temp;
 			}
 

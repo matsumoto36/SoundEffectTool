@@ -92,8 +92,7 @@ namespace AudioLibrary {
 
 	unique_ptr<AudioPlayer, AudioPlayerDeleter> Audio::CreateAudioPlayer() {
 		if (!_isInitialized) return nullptr;
-		auto player = unique_ptr<AudioPlayer, AudioPlayerDeleter>(new AudioPlayer(*_xAudio2));
-		return player;
+		return unique_ptr<AudioPlayer, AudioPlayerDeleter>(new AudioPlayer(*_xAudio2));
 	}
 
 	shared_ptr<AudioData> Audio::LoadAudioData(const wstring& filePath) {
@@ -105,6 +104,6 @@ namespace AudioLibrary {
 			return nullptr;
 		}
 		
-		return move(data);
+		return data;
 	}
 }

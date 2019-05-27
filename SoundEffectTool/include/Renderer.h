@@ -18,17 +18,13 @@ namespace SoundEffectTool {
 	class SOUNDEFFECTTOOL_API Renderer {
 
 		bool _isInitialized = false;
-		PointInt _maxSize;		// 出力される画面の最大サイズ
-		PointInt _drawSize;
+		PointInt _maxSize;							// 出力される画面の最大サイズ
+		PointInt _drawSize;							// 波形の描画サイズ
 
-		bool _isWaveRandered;
-		int _waveRenderHandler;
-		int _waveMarginY = 30;
-		int _drawMarginY = 10;
-		uint32_t _waveLength = 0;
-		PointInt _waveSize;
-		shared_ptr<AudioData> _audioData = nullptr;
-		vector<vector<PointInt>> _waveDrawingPoints;
+		int _waveRenderHandler = -1;				// 描画された波形のハンドラ
+		int _waveMarginY = 30;						// 波形との間の距離
+		int _drawMarginY = 10;						// 上下の間の距離
+		shared_ptr<AudioData> _audioData = nullptr;	// セットされた波形データ
 
 	public:
 
@@ -66,10 +62,12 @@ namespace SoundEffectTool {
 			return _drawSize;
 		}
 
-		// 波形を描画する
-		void DrawWave() const;
-
 		// 描画を更新する
 		void Draw(PointInt waveOffset, float playRatio) const;
+
+	private:
+
+		// 波形を描画する
+		void DrawWave(vector<vector<PointInt>> wavePoints, PointInt pixelSize) const;
 	};
 }

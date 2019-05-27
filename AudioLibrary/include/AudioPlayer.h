@@ -48,10 +48,12 @@ namespace AudioLibrary {
 			return _status == AudioPlayerStatus::Play;
 		}
 
+		// 音量を返す
 		float GetVolume() const {
 			return _volume;
 		}
 
+		// 音量を変更する
 		void SetVolume(float volume);
 
 		// 再生位置を取得
@@ -87,6 +89,7 @@ namespace AudioLibrary {
 		// データが整っているか調べる
 		HRESULT CheckValidData() const;
 
+		// システムに音声データ転送する
 		void AddBuffer(uint32_t requredBytes);
 
 		// 内部で使用するためのフェード

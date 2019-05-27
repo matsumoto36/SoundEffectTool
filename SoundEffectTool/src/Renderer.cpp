@@ -58,13 +58,10 @@ namespace SoundEffectTool {
 		if (pixelSize.X == 0 || pixelSize.Y == 0) return;
 
 		auto channlCount = _audioData->GetChannelCount();
-		_waveDrawingPoints.clear();
-		_waveDrawingPoints.resize(channlCount);
-
-		_waveSize = pixelSize;
+		auto wavePoints = vector<vector<PointInt>>(channlCount);
 
 		// 描画のサイズを計算(WPFのImageのサイズに使用される)
-		_drawSize = PointInt(_waveSize.X, _drawMarginY * 2 + (_waveSize.Y + _waveMarginY) * channlCount - _waveMarginY);
+		_drawSize = PointInt(pixelSize.X, _drawMarginY * 2 + (pixelSize.Y + _waveMarginY) * channlCount - _waveMarginY);
 
 		auto start = sampleStart * channlCount;
 		auto length = sampleLength * channlCount;
@@ -89,8 +86,7 @@ namespace SoundEffectTool {
 
 		// サイズを確保
 		for (size_t i = 0; i < (size_t)channlCount; i++) {
-			_waveDrawingPoints[i].clear();
-			_waveDrawingPoints[i].resize(dataCount);
+			wavePoints[i].resize(dataCount);
 		};
 
 		auto deltaI = (float)1 / dataCount;
@@ -102,24 +98,23 @@ namespace SoundEffectTool {
 
 				// 高さを直して追加する
 				auto drawData = (float)sample / maxHeight * (pixelSize.Y / 2.0f);
-				_waveDrawingPoints[j][i] = PointInt(int(pixelSize.X * i * deltaI), (int)drawData);
+				wavePoints[j][i] = PointInt(int(pixelSize.X * i * deltaI), (int)drawData);
 			}
 		}
 
 		delete[] sampleData;
 
 		// あらかじめ描画する
-		if (_isWaveRandered) DeleteGraph(_waveRenderHandler);
+		if (_waveRenderHandler != -1) DeleteGraph(_waveRenderHandler);
 		_waveRenderHandler = MakeGraph(_drawSize.X, _drawSize.Y);
-		DrawWave();
-		_isWaveRandered = true;
+		DrawWave(wavePoints, pixelSize);
 	}
 
 	void Renderer::ChangeDrawSize(PointInt size) {
 		SetWindowSize(size.X, size.Y);
 	}
 
-	void Renderer::DrawWave() const {
+	void Renderer::DrawWave(vector<vector<PointInt>> wavePoints, PointInt pixelSize) const {
 
 		// ターゲットを指定
 		SetDrawScreen(_waveRenderHandler);
@@ -132,16 +127,16 @@ namespace SoundEffectTool {
 
 		const auto zeroLineColor = GetColor(32, 32, 32);
 
-		auto waveSizeYHalf = _waveSize.Y / 2;
+		auto waveSizeYHalf = pixelSize.Y / 2;
 		auto offsetX = 0;
 		auto offsetY = _drawMarginY + waveSizeYHalf;
-		for (auto&& channel : _waveDrawingPoints) {
+		for (auto&& channel : wavePoints) {
 			
 			// 波形の中心を引く
-			DrawLine(0, offsetY, _waveSize.X, offsetY, zeroLineColor);
+			DrawLine(0, offsetY, pixelSize.X, offsetY, zeroLineColor);
 
 			// 波形の背景を描く
-			DrawFillBox(0, offsetY - waveSizeYHalf, _waveSize.X, offsetY + waveSizeYHalf, waveBackGroundColor);
+			DrawFillBox(0, offsetY - waveSizeYHalf, pixelSize.X, offsetY + waveSizeYHalf, waveBackGroundColor);
 
 			// 点のリストを描画する
 			auto prevSample = channel[0];
@@ -151,7 +146,7 @@ namespace SoundEffectTool {
 				prevSample = currentSample;
 			}
 
-			offsetY += _waveSize.Y + _waveMarginY;
+			offsetY += pixelSize.Y + _waveMarginY;
 		}
 	}
 
@@ -169,7 +164,7 @@ namespace SoundEffectTool {
 		const auto playRatioColor = GetColor(4, 4, 4);
 
 		// 再生位置に縦線を引く
-		auto positionX = int(_waveSize.X * playRatio + waveOffset.X);
+		auto positionX = int(_drawSize.X * playRatio + waveOffset.X);
 		DrawLine(positionX, 0, positionX, _drawSize.Y, playRatioColor);
 
 		ScreenFlip();

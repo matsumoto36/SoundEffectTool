@@ -11,6 +11,10 @@
 #include "ClassLibrary.h"
 #include "Extensions.h"
 
+namespace SoundEffectTool {
+	string MainSoundKey = "Main";
+}
+
 namespace {
 	using namespace SoundEffectTool;
 
@@ -19,8 +23,7 @@ namespace {
 
 		gcroot<SoundEffectToolVM^> m = manager;
 
-		auto key = m->MainSoundKey;
-		auto player = m->_audioController.GetAudioPlayer(ToStdString(key));
+		auto player = m->_audioController.GetAudioPlayer(MainSoundKey);
 
 		player->OnIsPlayChanged = [m](bool isPlay) {
 			m->CallOnAudioIsPlayChanged(isPlay);
@@ -38,8 +41,6 @@ namespace {
 }
 
 namespace SoundEffectTool {
-
-	string MainSoundKey = "Main";
 
 	SoundEffectToolVM::SoundEffectToolVM() :
 		_manager(new SoundEffectToolManager()),
@@ -69,6 +70,10 @@ namespace SoundEffectTool {
 		auto&& renderer = _manager->GetRenderer(ToStdString(windowName));
 		if (!renderer) return IntPtr(nullptr);
 		return IntPtr(const_cast<void*>(renderer->GetBackBuffer()));
+	}
+
+	float SoundEffectToolVM::GetDefaultPixelsPerSec() {
+		return _manager->DefaultPixelsPerSec;
 	}
 
 	bool SoundEffectToolVM::ChangeDrawSize(String^ windowName, Size size) {

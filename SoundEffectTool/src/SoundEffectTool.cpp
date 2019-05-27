@@ -33,9 +33,7 @@ namespace SoundEffectTool {
 		auto audioData = _audioController->GetAudioData(audioDataKey);
 		if (!audioData) return false;
 
-		player->SetSoundData(audioData);
-
-		return true;
+		return player->SetSoundData(audioData);;
 	}
 
 	bool SoundEffectToolManager::SetWaveData(string& rendererName, string& key) {
@@ -49,8 +47,7 @@ namespace SoundEffectTool {
 		renderer->SetAudioData(audioData);
 
 		// デフォルトの設定で描画データ準備
-		CalcWaveRenderingScale(rendererName, DefaultPixelsPerSec);
-		return true;
+		return CalcWaveRenderingScale(rendererName, DefaultPixelsPerSec);;
 	}
 
 	bool SoundEffectToolManager::CalcWaveRenderingScale(string& rendererName, float pixelsPerSec) {
@@ -60,11 +57,12 @@ namespace SoundEffectTool {
 		auto audioData = renderer->GetAudioData();
 		if (!audioData) return false;
 
+		// pixelsPerSecから波形を表示するサイズを計算
 		auto samplingRate = audioData->GetFormat().nSamplesPerSec;
 		auto length = audioData->GetSampleLength() / audioData->GetChannelCount();
 		auto sec = (float)length / samplingRate;
 		auto width = int(sec * pixelsPerSec);
-		renderer->CalcRenderingData(PointInt(width, DefaultWaveScaleY), 0, length);
+		renderer->CalcRenderingData(PointInt(width, DefaultWaveHeight), 0, length);
 		return true;
 	}
 

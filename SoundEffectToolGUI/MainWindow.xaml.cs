@@ -16,22 +16,24 @@ namespace SoundEffectToolGUI {
 
 		const string SoundKey = "MainSound";							// 音声ファイルにアクセスするためのキー
 		const string SoundFilePath = "Resource/Audio/MusicSurround.wav";// 音声ファイルのパス
+
 		private SoundEffectToolVM _soundEffectToolVM;					// 内部システム
 		private string _windowName = "WaveRenderer";					// 描画のウィンドウにアクセスするためのキー
 		private TimeSpan _lastRender;									// 最後に描画した時間
+		private Point _waveOffset;										// 波形を描画するときのオフセット
+		private float _wavePixelsPerSec;								// 波形の拡大率
 
 		private DispatcherTimer _audioTick;								// サウンド関係の更新タイマー
-		private Point _waveOffset;										// 波形を描画するときのオフセット
 		private DateTime _lastAudioTickTime;							// 最後にサウンドを更新した時間
 		private float _soundFileLength;									// 音楽ファイルの再生時間
 		private bool _currentPositionChanging;							// 再生位置を変更している途中か
-		private float _wavePixelsPerSec = 64;							// 波形の拡大率
 
 		private BitmapImage _startButtonImage;
 		private BitmapImage _pauseButtonImage;
 		private BitmapImage _volumeButtonImage;
 		private BitmapImage _volumeMuteButtonImage;
 
+		// 音量
 		private float _volume;
 		public float Volume {
 			get { return _volume; }
@@ -42,6 +44,7 @@ namespace SoundEffectToolGUI {
 			}
 		}
 
+		// 再生位置の比率
 		public float PlayRatio { get; set; }
 
 		public MainWindow() {
@@ -205,6 +208,7 @@ namespace SoundEffectToolGUI {
 			RenderOptions.SetEdgeMode(Image, EdgeMode.Aliased);
 			RenderOptions.SetBitmapScalingMode(Image, BitmapScalingMode.NearestNeighbor);
 
+
 			// ウィンドウハンドルを生成
 			var hwndSrc = new HwndSource(0, 0, 0, 0, 0, "DxLib", IntPtr.Zero);
 
@@ -223,6 +227,7 @@ namespace SoundEffectToolGUI {
 			D3DImage.IsFrontBufferAvailableChanged += D3DImage_IsFrontBufferAvailableChanged;
 
 			// 描画対象に設定
+			_wavePixelsPerSec = _soundEffectToolVM.GetDefaultPixelsPerSec();
 			_soundEffectToolVM.SetWaveData(_windowName, SoundKey);
 			var size = _soundEffectToolVM.GetDrawSize(_windowName);
 			ImageRect.Width = size.Width;
@@ -322,6 +327,7 @@ namespace SoundEffectToolGUI {
 				_soundEffectToolVM.UpdateAudio(deltaTime);
 				_lastAudioTickTime = DateTime.Now;
 
+				// 再生位置を更新
 				var position = _soundEffectToolVM.GetMainPlayerPosition();
 				var ratio = position / _soundFileLength;
 				if(_soundFileLength == 0) {
