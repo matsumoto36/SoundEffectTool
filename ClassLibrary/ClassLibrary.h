@@ -19,6 +19,7 @@ namespace SoundEffectTool {
 
 	private:
 
+
 	public:
 
 		// 再生の状態が変化した場合に呼ばれる

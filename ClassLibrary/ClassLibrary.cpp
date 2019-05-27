@@ -19,7 +19,8 @@ namespace {
 
 		gcroot<SoundEffectToolVM^> m = manager;
 
-		auto player = m->_audioController.GetAudioPlayer("Main");
+		auto key = m->MainSoundKey;
+		auto player = m->_audioController.GetAudioPlayer(ToStdString(key));
 
 		player->OnIsPlayChanged = [m](bool isPlay) {
 			m->CallOnAudioIsPlayChanged(isPlay);
@@ -38,12 +39,14 @@ namespace {
 
 namespace SoundEffectTool {
 
+	string MainSoundKey = "Main";
+
 	SoundEffectToolVM::SoundEffectToolVM() :
 		_manager(new SoundEffectToolManager()),
 		_audioController(_manager->GetAudioController()) {
 		
 		// メインで扱うプレイヤーを作成
-		_audioController.CreateAudioPlayer("Main");
+		_audioController.CreateAudioPlayer(MainSoundKey);
 
 		// 通知をリンク
 		LinkEvent(this);
@@ -64,8 +67,7 @@ namespace SoundEffectTool {
 
 	const IntPtr SoundEffectToolVM::GetBackBuffer(String^ windowName) {
 		auto&& renderer = _manager->GetRenderer(ToStdString(windowName));
-		if (!renderer) 
-			return IntPtr(nullptr);
+		if (!renderer) return IntPtr(nullptr);
 		return IntPtr(const_cast<void*>(renderer->GetBackBuffer()));
 	}
 
@@ -85,8 +87,7 @@ namespace SoundEffectTool {
 
 	bool SoundEffectToolVM::Draw(String^ windowName, Point offset, float playRatio) {
 		auto&& renderer = _manager->GetRenderer(ToStdString(windowName));
-		if (!renderer) 
-			return false;
+		if (!renderer) return false;
 
 		renderer->Draw(PointInt((int)offset.X, (int)offset.Y), playRatio);
 		return true;
@@ -105,7 +106,7 @@ namespace SoundEffectTool {
 	}
 
 	bool SoundEffectToolVM::SetMainSound(String^ key) {
-		return _manager->SetSoundData(ToStdString("Main"), ToStdString(key));
+		return _manager->SetSoundData(MainSoundKey, ToStdString(key));
 	}
 
 	bool SoundEffectToolVM::SetWaveData(String^ windowName, String^ key) {
@@ -117,38 +118,38 @@ namespace SoundEffectTool {
 	}
 
 	bool SoundEffectToolVM::IsPlay() {
-		return _audioController.GetAudioPlayer("Main")->IsPlay();
+		return _audioController.GetAudioPlayer(MainSoundKey)->IsPlay();
 	}
 
 	float SoundEffectToolVM::GetVolume() {
-		return _audioController.GetAudioPlayer("Main")->GetVolume();
+		return _audioController.GetAudioPlayer(MainSoundKey)->GetVolume();
 	}
 
 	void SoundEffectToolVM::SetVolume(float volume) {
-		_audioController.GetAudioPlayer("Main")->SetVolume(volume);
+		_audioController.GetAudioPlayer(MainSoundKey)->SetVolume(volume);
 	}
 
 	float SoundEffectToolVM::GetMainPlayerPosition() {
-		return _audioController.GetAudioPlayer("Main")->GetPlayPosition();
+		return _audioController.GetAudioPlayer(MainSoundKey)->GetPlayPosition();
 	}
 
 	float SoundEffectToolVM::GetSoundFileLength() {
-		return _audioController.GetAudioPlayer("Main")->GetFileLength();
+		return _audioController.GetAudioPlayer(MainSoundKey)->GetFileLength();
 	}
 
 	bool SoundEffectToolVM::PlayMainSound() {
-		return _audioController.GetAudioPlayer("Main")->PlayStart();
+		return _audioController.GetAudioPlayer(MainSoundKey)->PlayStart();
 	}
 
 	bool SoundEffectToolVM::PlayMainSoundAtPosition(float position) {
-		return _audioController.GetAudioPlayer("Main")->PlayStart(position);
+		return _audioController.GetAudioPlayer(MainSoundKey)->PlayStart(position);
 	}
 
 	bool SoundEffectToolVM::StopMainSound() {
-		return _audioController.GetAudioPlayer("Main")->Stop();
+		return _audioController.GetAudioPlayer(MainSoundKey)->Stop();
 	}
 
 	bool SoundEffectToolVM::PauseMainSound() {
-		return _audioController.GetAudioPlayer("Main")->Pause();
+		return _audioController.GetAudioPlayer(MainSoundKey)->Pause();
 	}
 }

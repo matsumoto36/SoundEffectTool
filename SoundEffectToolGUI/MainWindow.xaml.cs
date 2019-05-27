@@ -1,19 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Windows.Threading;
 using SoundEffectTool;
 
@@ -24,17 +15,17 @@ namespace SoundEffectToolGUI {
 	public partial class MainWindow : Window {
 
 		const string SoundKey = "MainSound";							// 音声ファイルにアクセスするためのキー
-		const string SoundFilePath = "Resource/Audio/MusicSurround.wav";	// 音声ファイルのパス
-		private SoundEffectToolVM _soundEffectToolVM;
-		private string _windowName = "WaveRenderer";
-		private TimeSpan _lastRender;
+		const string SoundFilePath = "Resource/Audio/MusicSurround.wav";// 音声ファイルのパス
+		private SoundEffectToolVM _soundEffectToolVM;					// 内部システム
+		private string _windowName = "WaveRenderer";					// 描画のウィンドウにアクセスするためのキー
+		private TimeSpan _lastRender;									// 最後に描画した時間
 
-		private DispatcherTimer _audioTick;
-		private Point _waveOffset;
-		private DateTime _lastTick;
-		private float _soundFileLength;
-		private bool _playerPositionChanging;
-		private float _wavePixelsPerSec = 64;
+		private DispatcherTimer _audioTick;								// サウンド関係の更新タイマー
+		private Point _waveOffset;										// 波形を描画するときのオフセット
+		private DateTime _lastAudioTickTime;							// 最後にサウンドを更新した時間
+		private float _soundFileLength;									// 音楽ファイルの再生時間
+		private bool _currentPositionChanging;							// 再生位置を変更している途中か
+		private float _wavePixelsPerSec = 64;							// 波形の拡大率
 
 		private BitmapImage _startButtonImage;
 		private BitmapImage _pauseButtonImage;
@@ -96,7 +87,7 @@ namespace SoundEffectToolGUI {
 
 			if(current == _wavePixelsPerSec) return;
 
-			// 横幅を変更する
+			// 波形の横幅を変更する
 			_soundEffectToolVM.CalcWaveRenderingScale(_windowName, _wavePixelsPerSec = current);
 
 			// サイズ変更
@@ -133,7 +124,8 @@ namespace SoundEffectToolGUI {
 		}
 
 		private void MenuItem_Info_Click(object sender, RoutedEventArgs e) {
-			MessageBox.Show("使用したライブラリ/フレームワーク\r\n・Dxlib\r\n・XAudio2\r\n・Extended WPF Toolkit", "情報", MessageBoxButton.OK);
+			var message = "使用したライブラリ/フレームワーク\r\n・Dxlib\r\n・XAudio2\r\n・Extended WPF Toolkit";
+			MessageBox.Show(message, "情報", MessageBoxButton.OK);
 		}
 
 		private void StartButton_Click(object sender, RoutedEventArgs e) {
@@ -151,35 +143,36 @@ namespace SoundEffectToolGUI {
 
 		private void MuteButton_Click(object sender, RoutedEventArgs e) {
 			if(_volume != 0) {
-				// ミュートにする
 				Volume = 0;
 			}
 			else {
-				// 音量を戻す
 				Volume = (float)VolumeSlider.Value;
 			}
 		}
 
 		private void VolumeSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {
-			// 音量を変更
 			Volume = (float)e.NewValue;
 		}
 
 		private void PlayPositionSlider_PreviewMouseDown(object sender, MouseButtonEventArgs e) {
-			_playerPositionChanging = true;
+			_currentPositionChanging = true;
 		}
 
 		private void PlayPositionSlider_PreviewMouseUp(object sender, MouseButtonEventArgs e) {
-			_playerPositionChanging = false;
+			_currentPositionChanging = false;
+
+			// スライダーの位置を再生位置にする
 			PlayRatio = (float)PlayPositionSlider.Value;
 			PlayPositionLabel.Content = ToTime(PlayRatio * _soundFileLength);
+
+			// 再生している場合は止めずに再生
 			if(_soundEffectToolVM.IsPlay()) {
-				// 再生位置を変更して再生
 				_soundEffectToolVM.PlayMainSoundAtPosition(PlayRatio * _soundFileLength);
 			}
 		}
 
 		private void PlayPositionSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {
+			// スライダーの位置を時間にする
 			PlayPositionLabel.Content = ToTime(PlayRatio * _soundFileLength);
 		}
 		#endregion
@@ -216,7 +209,10 @@ namespace SoundEffectToolGUI {
 			var hwndSrc = new HwndSource(0, 0, 0, 0, 0, "DxLib", IntPtr.Zero);
 
 			// Imageは1920*1080固定
-			Image.RenderSize = new Size(1920, 1080);
+			var imageSize = new Size(1920, 1080);
+			Image.RenderSize = imageSize;
+			Image.Width = imageSize.Width;
+			Image.Height = imageSize.Height;
 			_soundEffectToolVM.CreateDxView(hwndSrc.Handle, _windowName, Image.RenderSize);
 
 			D3DImage = new D3DImage();
@@ -318,13 +314,13 @@ namespace SoundEffectToolGUI {
 			// タイマー起動
 			_audioTick = new DispatcherTimer();
 			_audioTick.Interval = new TimeSpan(1);
-			_lastTick = DateTime.Now;
+			_lastAudioTickTime = DateTime.Now;
 			_audioTick.Tick += (s, e) => {
 
 				// 音楽系更新
-				var deltaTime = (float)(DateTime.Now - _lastTick).TotalSeconds;
+				var deltaTime = (float)(DateTime.Now - _lastAudioTickTime).TotalSeconds;
 				_soundEffectToolVM.UpdateAudio(deltaTime);
-				_lastTick = DateTime.Now;
+				_lastAudioTickTime = DateTime.Now;
 
 				var position = _soundEffectToolVM.GetMainPlayerPosition();
 				var ratio = position / _soundFileLength;
@@ -338,15 +334,16 @@ namespace SoundEffectToolGUI {
 				PlayRatio = ratio;
 				PlayPositionLabel.Content = ToTime(position);
 
-				// 一秒ごとに再生位置の表示更新
-				if (Math.Floor(position) != Math.Floor(position - deltaTime) && !_playerPositionChanging) {
+				// 1秒ごとに再生位置の表示更新
+				// スライダーに触れている間は、再生位置の更新をしないようにする
+				if(Math.Floor(position) != Math.Floor(position - deltaTime) && !_currentPositionChanging) {
 					PlayPositionSlider.Value = PlayRatio;
 				}
 
 			};
 			_audioTick.Start();
 
-
+			// アプリを終了するときにタイマーも終了する
 			Closed += (s, e) => {
 				_audioTick.Stop();
 			};
@@ -362,6 +359,7 @@ namespace SoundEffectToolGUI {
 			var args = (RenderingEventArgs)e;
 			if(D3DImage.IsFrontBufferAvailable && _lastRender.TotalSeconds + 0.02 < args.RenderingTime.TotalSeconds) {
 
+				// バックバッファの取得
 				var backBuffer = _soundEffectToolVM.GetBackBuffer(_windowName);
 				if(backBuffer != IntPtr.Zero) {
 
